@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en-US">
+<head>
+<title></title>
+<script src="switcher.js"></script>
+</head>
+<body>
+
+  <div id="error">Configuration Error</div>
+
+  <div id="icon" style="display:none"></div>
+  
+  <div id="panel">
+	<div style="float:right" id="x">x</div>
+	
+	<h2>Crosscloud Pod Control</h2>
+
+	<p><i>(...crude temporary interface...)</i></p>
+
+	<p id="podurlprompt">Your Pod URL: 
+	<input id="podurl" type="text" size="30"></input>
+	</p>
+
+	<div id="selectedpod" style="display:none">Currently selected pod: <span style="font-family: monospace; color: green;" id="selectedpodurl">none</span> <button type="button" id="changepodbutton">change</button>
+	</div>
+
+	<p id="podprogress" style="display:none"></p>
+
+  </div>
+</body>
+</html>

@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en-US">
+<head>
+<title>crosscloud.js readme</title>
+</head>
+<body>
+<h1>crosscloud.js readme !!VERSION!!</h1>
+<pre>
+
+
+&lt;script src="http://crosscloud.org/!!VERSION!!/crosscloud.js">&lt;/script>
+&lt;script src="https://code.jquery.com/jquery-2.1.1.min.js">&lt;/script>
+&lt;script>
+
+$(function(){
+
+  var pod = new crosscloud.PodClient();
+
+  pod.push({ ... some data item you want to add or update ...})
+
+  pod.addQuery({
+      onAllResults: function (items) { ... called with matching items ... },
+	  pattern: { someProperty: "its required value",
+                 anotherProperty: "its value",
+				 andAnother: { "$exists": true }
+      }
+  });
+});
+
+&lt;/script>
+
+</pre>
+</body>
+</html>
