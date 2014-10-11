@@ -1,22 +1,41 @@
+"use strict";
+
+console.log(0);
 
 $(function(){
 
-	var out = document.createElement("div");
-	document.body.insertBefore(out, document.body.firstChild);
-	out.innerHTML = "(running)"
-	out.style.padding = "1em";
-	out.style.border = "2px solid black";
+	console.log(2);
 
-	var pod = new crosscloud.PodClient();
+	$("#error").html("");
 
-	var myItem = {isHelloWorld:true};
-	pod.push(myItem);
+	console.log(3);
 
-	pod.addQuery({
-		pattern: { isHelloWorld: true },
-		onAllResults: function (items) {
-			out.innerHTML = JSON.stringify
-		}
+	var pod = crosscloud.connect();
+
+	console.log(3.5);
+
+	$("#helloButton").click(function() {
+		pod.push({isHelloWorld3:true}, function(item, err) {
+			console.log('new item', item);
+		});
 	});
 
+	console.log(4);
+
+	pod.query()
+		.filter({isHelloWorld3:true})
+		.onAllResults(function(items) {
+			console.log(5000);
+			var out = "";
+			items.forEach(function(item) {
+				out += "<pre>item: "+JSON.stringify(item)+"</pre>";
+			});
+			$("#out").html(out);
+		})
+		.start();
+
+	console.log(5);
+
 });
+
+console.log(1);

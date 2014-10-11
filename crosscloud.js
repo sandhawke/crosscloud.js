@@ -10,7 +10,7 @@
   This library defines crosscloud.PodClient().  Typically you'll
   instantiate this and use it throughout the app, like:
 
-     var pod = new crosscloud.PodClient();
+     var pod = new crosscloud.connect();
 
 	 pod.push({'name':'Alice Example', 'email':'alice@example.com'},
               function (item, err) { ... callback ... });
@@ -44,6 +44,12 @@
 	//  -- default pod providers
 	//  -- offered micropod provider
 	//
+
+	// TODO: redo this not-OO style
+	exports.connect = function () {
+		return new exports.PodClient();
+	}
+
 	exports.PodClient = function PodClient(options){
 		if ( !(this instanceof PodClient) ) {
 			throw new Error("Constructor called as a function. Must use 'new'");
@@ -115,14 +121,16 @@
 
 			// other messages handled via callbacks set by pod._newCallback()
 
-			var callback = that.callbacks[event.data.calling];
-			if (callback) {
+			var callback = that.callbacks[event.data.callback];
+			console.log('callback', callback, event.data.callback, that.callbacks);
+			if (callback !== undefined) {
 				if (event.data.releaseCallback) {
-					delete that.callbacks[event.data.calling];
+					delete that.callbacks[event.data.callback];
 				}
 				callback(event.data, event.err)
 			} else {
-				console.log('crosscloud.js: received postMessage with unallocated callback handle', event.data.calling);
+				console.log('crosscloud.js: received postMessage with unallocated callback handle', event.data.callback);
+				console.log('options', that.callbacks);
 			}
 		}, false);
 
@@ -216,6 +224,7 @@
 	pod._newCallback = function(cb) {
 		var handle = this.callbackHandleCount++;
 		this.callbacks[handle] = cb;
+		return handle;
 	}
 
 
@@ -224,25 +233,69 @@
 		this._sendToPod({op:"pop"});
 	}
 
-	pod.addQuery = function(q) {
-		var msg = { op:"addQuery" };
 
-		if (q.onAllResults) {
-			msg.allResults = this._newCallback(q.allResults);
+	function Query (onPod) { 
+		this.pod = onPod;
+		this.msg = { maxCallsPerSecond:20 };
+	};
+	Query.prototype.filter = function (p) {
+		this.msg.filter = p;
+		return this;
+	}
+	Query.prototype.onAllResults = function (c) {
+		if (this.msg.onAllResults) {
+			delete this.pod.callbacks[this.msg.onAllResults];
 		}
-
-		msg.maxCallsPerSecond = 5;
-		if (q.maxCallsPerSecond) {
-			msg.maxCallsPerSecond = q.maxCallsPerSecond;
+		this.msg.onAllResults = this.pod._newCallback(function (msg) {
+			c(msg.data._members);
+		});
+		return this;
+	}
+	Query.prototype.start = function () {
+		this.msg.op = 'start-query';
+		this.pod._sendToPod(this.msg);
+		return this;
+	}
+	Query.prototype.stop = function () {
+		this.msg.op = 'stop-query';
+		this.pod._sendToPod(this.msg);
+		return this;
+	}
+						
+	pod.query = function(config) {
+		var result = new Query(this);
+		if (config) {
+			result.filter(config.filter);
+			result.onAllResults(config.onAllResults);
 		}
-
-		this._sendToPod(msg);
+		return result;
 	}
 
+	var applyOverlay = function(main, overlay) {
+		for (var k in overlay) {
+			if (overlay.hasOwnProperty(k)) {
+				var value = overlay[k];
+				if (value === null) {
+					delete main[k];
+				} else if (typeof value === "object" &&
+						   typeof main[k] === "object" &&
+						   !value.isArray() &&
+						   !main[k].isArray()) {
+					applyOverlay(main[k], value);
+				} else {
+					main[k]=overlay[k];
+				}
+			}
+		}
+	};
+
+
+	// switch to promises style when we figure out how we want to polyfill
 	pod.push = function(page, appCallback) {
-		var callback = function(overlay,err) {
+		var callback = function(msg,err) {
+			var overlay = msg.data;
 			applyOverlay(page, overlay);
-			appCallback(overlay, err);
+			if (appCallback) appCallback(overlay, err);
 		}
 		this._sendToPod({op:"push", 
 					data: page, 
@@ -250,11 +303,17 @@
 				   });
 	}
 
-	pod.watch = function(pageOrId, callback) {
-		this._sendToPod({op:"watch", 
-					data: pageOrId, 
-					callback:this._newCallback(callback)
-				   });
+
+
+	pod.pull = function(page, appCallback) {
+		var callback = function(overlay,err) {
+			applyOverlay(page, overlay);
+			if (appCallback) appCallback(overlay, err);
+		}
+		this._sendToPod({op:"pull", 
+						 pageId: page._id,
+						 callback:this._newCallback(callback)
+						});
 	}
 
 

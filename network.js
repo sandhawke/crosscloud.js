@@ -41,6 +41,8 @@ function main() {
 		} else if (message.op === "push") {
 			console.log('pushing', message.data);
 			push(message.data, message.callback);
+		} else if (message.op === "start-query") {
+			startQuery(message);
 		} else {
 			console.log('podlogin UNHANDLED', message);
 		}
@@ -98,7 +100,78 @@ function main() {
 		var content = JSON.stringify(data);
 		request.send(content);
 		console.log('request sent', request);
-	} 
+	}
+
+	var startQuery = function(msg) {
+		
+		// for now this means we do a query, then loop, long-polling
+		// for a different result to the query
+
+		var etag = null;
+		var startAt = Date.now();
+		var args = []
+		var url = podURL + "/_q0"
+
+		args.push("jsonFilter="+encodeURIComponent(JSON.stringify(msg.filter)));
+
+		if (args.length) {
+			url += "?" + args.join("&");
+		}
+		
+		var doRequest = function () {
+			
+			var request = new XMLHttpRequest();
+			request.open("GET", url, true);
+			if (etag !== null) {
+				request.setRequestHeader("Wait-For-None-Match", etag);
+				console.log('waiting for etag different from', etag);
+			}
+			request.onreadystatechange = function() {
+				console.log('4200', request.readyState, request);
+				if (request.readyState==4) {
+					if (request.status==200) {
+						handleResponse(request.responseText)
+					} else {
+						// TODO: mostly we should handle
+						// these, rather than sending them
+						// to the app?
+						error = { status:request.status, 
+								  message:"http GET error response "+request.status+" on "+url };
+						console.log('query error', error);
+						sendToApp({
+							callback:onError,
+							error:error});
+					}
+				}
+			}
+			request.send();
+			console.log('4100', url);
+		};
+		
+		var handleResponse = function (responseText) {
+			console.log('4300');
+			var responseJSON = JSON.parse(responseText);
+
+			// not sure we can safely get it from the header
+			etag = responseJSON._etag;
+
+			var elapsed = Date.now() - startAt;
+			var rmsg = {
+				callback:msg.onAllResults,
+				data:responseJSON,
+				elapsed:elapsed
+			}
+			console.log('4320', rmsg);
+			sendToApp(rmsg);
+
+			var sleepMs = 1000/msg.maxCallsPerSecond - elapsed;
+			setTimeout(doRequest, sleepMs);
+		}
+
+		console.log('4000');
+		doRequest();
+
+	}
 
 			
 }

@@ -18,7 +18,7 @@ function main() {
 	var iframeTimeout = null;
 
 	var sendToApp = function (m) {
-		console.log("<<login", m);
+		console.log("<<switcherToApp", m);
 		app.postMessage(m, "*");   // appOrigin?
 	}
 
@@ -44,7 +44,7 @@ function main() {
 		}
 		*/
 
-		console.log('>>login<<', event.data);
+		console.log('>>switcher received<<', event.data);
 
 		var message = event.data
 		
@@ -147,7 +147,7 @@ function main() {
 	}
 
 	var sendToPod = function (m) {
-		console.log("login>>", m);
+		console.log("switcherToPod>>", m);
 		podiframe.contentWindow.postMessage(m, podorigin);
 	}
 
@@ -219,7 +219,7 @@ function main() {
 	document.body.style.margin = "0";
 	document.body.style.padding = "0";
 
-	icon = document.getElementById("icon");
+	var icon = document.getElementById("icon");
 	icon.innerHTML = "Pod";
 	icon.style.margin = "0";
 	icon.style.padding = "1px"
