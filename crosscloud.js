@@ -59,7 +59,7 @@
 
 		that.connected = false;
 		that.callbacks = {};
-		that.callbackHandleCount = 0;
+		that.callbackHandleCount = 1;  // 0 would be no callback!
 		that.options = options || {};
 		that.loggedInURL = null;
 		that.onLoginCallbacks = [];

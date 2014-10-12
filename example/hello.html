@@ -5,17 +5,51 @@
 <script src="http://crosscloud.org/!!VERSION!!/crosscloud.js"></script>
 <script src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
 <script src="hello.js"></script>
+<style>
+body { 
+  font-family: Arial; 
+}
+.note {
+  margin: 0;
+  padding-left: 2em;
+  font-size: 85%;
+  font-style: italic;
+}
+table {
+    border-width: 5px;
+}
+thead td {
+  background: #ccc;
+}
+tbody tr th {
+  border-bottom: 1px solid #ccc;
+}
+tbody tr:hover {
+ background: #eee;
+}
+td, th {
+ padding: 2px;
+ padding-left: 6px
+}
+</style>
 </head>
 <body>
   <div id="error">JS Not Running</div>
   <div>
-	<h2>Say Hello</h2>
-	<button id="helloButton">Hello, World</button>
-  </div>
-  <div>
-	<h2>Who Has Said Hello?</h2>
-	<div id="out">
-	</div>
+
+	<h2>Hello, World!<br/><span style="font-size: 70%; color:gray;">Crosscloud Demo Application</span></h2>
+
+	<p class="note">This is a variation on the concept of a <a href="http://en.wikipedia.org/wiki/%22Hello,_world!%22_program">Hello, World program</a>.  With this one, the user actually says Hello to everyone else who runs the program.  So it's more complicated that just displaying a string, but it's still quite simple for a multi-user Web Application.  You should be able to save this page (with the associated <a href="hello.hs">hello.js</a> to your local filesystem and run them from there (or another Web server), modifying them as you like -- still working with the same multi-user data.</p>
+
+	<p>Hello from: 
+	<input id="nick" type="text" placeholder="your name (optional)" size="20" />
+	<button id="helloButton">Hello, World!</button>
+	</p>
+
+	<p>Recent "Hello, World!" Messages:</p>
+
+	<div id="out"><i>Waiting for query results...</i></div>
+
   </div>
 </body>
 </html>

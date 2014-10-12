@@ -26,13 +26,13 @@ function main() {
 
 	var sendToApp = function (m) {
 		m.toApp = true;
-		console.log("<<podlogin", m);
+		console.log("<<network", m);
 		parent.postMessage(m, "*");
 	}
 
 	window.addEventListener("message", function(event) {
 
-		console.log('>>podlogin ', event.data);
+		console.log('>>network ', event.data);
 
 		var message = event.data
 		
@@ -44,10 +44,11 @@ function main() {
 		} else if (message.op === "start-query") {
 			startQuery(message);
 		} else {
-			console.log('podlogin UNHANDLED', message);
+			console.log('network UNHANDLED', message);
 		}
 	}, false);
 
+	console.log("9010");
 	sendToApp({op:"awake"});
 
 	// fakepods alwauys has everybody logged in
@@ -135,17 +136,21 @@ function main() {
 						// TODO: mostly we should handle
 						// these, rather than sending them
 						// to the app?
-						error = { status:request.status, 
+						var error = { status:request.status, 
 								  message:"http GET error response "+request.status+" on "+url };
-						console.log('query error', error);
-						sendToApp({
-							callback:onError,
-							error:error});
+						console.log('! query error', error);
+						if (msg.onError) {
+							sendToApp({
+								callback:msg.onError,
+								error:error});
+						} else {
+							// how to tell someone??
+						}
 					}
 				}
 			}
 			request.send();
-			console.log('4100', url);
+			console.log('4100', url, request);
 		};
 		
 		var handleResponse = function (responseText) {
@@ -195,3 +200,4 @@ if (typeof document !== "undefined") {
 	onready();
 }
 
+console.log("9000");

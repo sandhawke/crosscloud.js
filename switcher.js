@@ -107,7 +107,7 @@ function main() {
 		onConnected = function () {
 			connected = true;
 			if (timeout) { clearTimeout(timeout); }
-			console.log('x', Date.now()-iframeStart, 'awake');
+			console.log('x', Date.now()-iframeStart, 'awake', timeout);
 			setConnectionStatus('pod iframe running', podURL);
 			if (whenDone) whenDone();
 		}
@@ -127,8 +127,10 @@ function main() {
 		podiframe.addEventListener("load", function(e) {
 			console.log(Date.now()-iframeStart, 'iframe loaded', e);
 			timeout = setTimeout(function() {
+				// BUG: we seem to be getting this randomly in chrome
 				setConnectionStatus('failed', podframeurl);
-			}, 500);
+			}, 2000);
+			console.log('timeout set', timeout);
 		});
 		console.log('GET', podframeurl);
 		podiframe.setAttribute("src", podframeurl);
@@ -142,8 +144,11 @@ function main() {
 
 	var disconnectFromPod = function (m) {
 		connected = false;
-		// sendToApp({op:"logout"});
+		podURL = null;
 		document.body.removeChild(poddiv);
+		localStorage.removeItem('selectedPodURL');
+		sendToApp({op:"logout"});
+		setConnectionStatus("no pod selected");
 	}
 
 	var sendToPod = function (m) {
@@ -271,6 +276,7 @@ function main() {
 			podurlElement.value = podurl;
 		}
 		if (podurl == "") return;
+		if (podurl == podURL) return;  // this isn't a change!
 
 		console.log('got url', podurl);
 		document.getElementById('podurlprompt').style.display="none";
@@ -280,12 +286,12 @@ function main() {
 		out.appendChild(document.createTextNode(podurl));
 
 		document.getElementById('selectedpod').style.display="block";
-		disconnectFromPod();
 		connectToPod(podurl);
 	};
 	document.getElementById('changepodbutton').addEventListener("click", function(e) {
 		document.getElementById('podurlprompt').style.display="block";
 		document.getElementById('selectedpod').style.display="none";
+		disconnectFromPod();
 	});
 	panel.style.display = "none";
 
@@ -313,13 +319,12 @@ function main() {
 		} else if (status === "no pod selected") {
 			// document.getElementById('podprogress').style.display="none";
 			document.getElementById('podprogress').innerHTML = "Please Select a Pod";
-			localStorage.setItem('selectedPodURL', null);
 		} else if (status === "loading iframe") {
 			document.getElementById('podprogress').style.display="block";
 			document.getElementById('podprogress').innerHTML = "Connecting...";
 		} else if (status === "failed") {
 			document.getElementById('podprogress').style.display="block";
-			document.getElementById('podprogress').innerHTML = "Unable to load <a href='"+url+"'>"+url;
+			document.getElementById('podprogress').innerHTML = "Unable to load <a target='_blank' href='"+url+"'>"+url;
 		}
 	}
 
