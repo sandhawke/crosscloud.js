@@ -14,21 +14,23 @@
 
 $(function(){
 
-  var pod = new crosscloud.PodClient();
+  var pod = crosscloud.connect();
 
   pod.push({ ... some data item you want to add or update ...})
 
-  pod.addQuery({
-      onAllResults: function (items) { ... called with matching items ... },
-	  pattern: { someProperty: "its required value",
-                 anotherProperty: "its value",
-				 andAnother: { "$exists": true }
-      }
-  });
-});
+  pod.query()
+     .onAllResults(function (items) { ... called with matching items ... })
+	 .pattern({ someProperty: "its required value",
+                anotherProperty: "its value",
+			    andAnother: { "$exists": true }  })
+     .start();
 
+}
 &lt;/script>
 
 </pre>
+
+<p>See <a href="example/hello.html">example/hello.html</a> for a working demo.</p>
+
 </body>
 </html>
