@@ -56,10 +56,17 @@ $(function(){
 		}
 	};
 
-	pod.query()
-		.filter( { isHelloWorld4:true } )
-		.onAllResults(displayMessages)
-		.start();
+	pod.onLogin(function () {
+		$("#out").html("waiting for data...");
+		pod.onLogout(function () {
+			$("#out").html("<i>not connected</i>");
+		});
+
+		pod.query()
+			.filter( { isHelloWorld4:true } )
+			.onAllResults(displayMessages)
+			.start();
+	});
 
 });
 

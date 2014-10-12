@@ -112,12 +112,15 @@
 			console.log(91);
 
 			if (event.data.op === "logout") {
+				console.log("calling logout handlers:");
 				that.loggedInURL = event.data.podURL;
 				that.onLogoutCallbacks.forEach(function(cb) {
+					console.log("calling logout handler", cb);
 					cb();
 				});
 				return;
 			}
+			console.log(92);
 
 			// other messages handled via callbacks set by pod._newCallback()
 
