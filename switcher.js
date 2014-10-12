@@ -277,6 +277,11 @@ function main() {
 		}
 		if (podurl == "") return;
 		if (podurl == podURL) return;  // this isn't a change!
+		
+		if (podurl.slice(0,12) === "http://demo.") {
+			// actually this hostname seems to misbehave in chrome
+			alert("don't use 'demo.fakepods.com' please");
+		}
 
 		console.log('got url', podurl);
 		document.getElementById('podurlprompt').style.display="none";

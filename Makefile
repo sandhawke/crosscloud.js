@@ -1,4 +1,5 @@
 VERSION=0.1.1-alpha-$(shell id -un)
+#VERSION=0.1.1
 
 default:
 	@echo 'do you mean make deploy?'
