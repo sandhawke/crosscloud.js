@@ -126,6 +126,8 @@ function main() {
 			if (etag !== null) {
 				request.setRequestHeader("Wait-For-None-Match", etag);
 				console.log('waiting for etag different from', etag);
+			} else {
+				console.log('any etag');
 			}
 			request.onreadystatechange = function() {
 				console.log('4200', request.readyState, request);
@@ -149,8 +151,33 @@ function main() {
 					}
 				}
 			}
+			request.onabort = function(e) {
+				console.log('request abort', e);
+			}
+			request.onerror = function(e) {
+				console.log('request error', e);
+			}
+			request.loadend = function(e) {
+				console.log('request loadend', e);
+			}
+			request.ontimeout = function(e) {
+				console.log('request timeout', e);
+			}
+			// request.timeout = 1000;
+			// request.responseType = "json";   requires responseText change
 			request.send();
 			console.log('4100', url, request);
+			console.log('...?');
+
+			/*
+			  
+			  somehow we're ending up here, and then nothing ever happens
+			  with the request....   !!BUG!!
+			  
+			  it's tempting to try jsonp   :-(
+
+			 */
+
 		};
 		
 		var handleResponse = function (responseText) {

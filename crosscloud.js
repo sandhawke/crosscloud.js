@@ -105,7 +105,7 @@
 				}
 				console.log('callbacks', that.onLoginCallbacks);
 				that.onLoginCallbacks.forEach(function(cb) {
-					cb();
+					cb(that.loggedInURL);
 				});
 				return;
 			}
