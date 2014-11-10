@@ -26,20 +26,20 @@ function main() {
 
 	var sendToApp = function (m) {
 		m.toApp = true;
-		console.log("<<network", m);
+		//console.log("<<network", m);
 		parent.postMessage(m, "*");
 	}
 
 	window.addEventListener("message", function(event) {
 
-		console.log('>>network ', event.data);
+		//console.log('>>network ', event.data);
 
 		var message = event.data
 		
 		if (message.op === "pop") {
-			console.log("POP");
+			//console.log("POP");
 		} else if (message.op === "push") {
-			console.log('pushing', message.data);
+			//console.log('pushing', message.data);
 			push(message.data, message.callback);
 		} else if (message.op === "start-query") {
 			startQuery(message);
@@ -48,7 +48,7 @@ function main() {
 		}
 	}, false);
 
-	console.log("9010");
+	//console.log("9010");
 	sendToApp({op:"awake"});
 
 	// fakepods alwauys has everybody logged in
@@ -71,7 +71,7 @@ function main() {
 				if ( !("_id" in data) ) {
 					if (request.status==201) {
 						overlay._id = request.getResponseHeader("Location");
-						console.log('just set _id to', data._id);
+						//console.log('just set _id to', data._id);
 					} else {
 						error = { status:request.status, 
 								  message:"http POST error response "+request.status };
@@ -100,7 +100,7 @@ function main() {
 		request.setRequestHeader("Content-type", "application/json");
 		var content = JSON.stringify(data);
 		request.send(content);
-		console.log('request sent', request);
+		//console.log('request sent', request);
 	}
 
 	var startQuery = function(msg) {
@@ -125,12 +125,12 @@ function main() {
 			request.open("GET", url, true);
 			if (etag !== null) {
 				request.setRequestHeader("Wait-For-None-Match", etag);
-				console.log('waiting for etag different from', etag);
+				//console.log('waiting for etag different from', etag);
 			} else {
-				console.log('any etag');
+				//console.log('any etag');
 			}
 			request.onreadystatechange = function() {
-				console.log('4200', request.readyState, request);
+				//console.log('4200', request.readyState, request);
 				if (request.readyState==4) {
 					if (request.status==200) {
 						handleResponse(request.responseText)
@@ -140,7 +140,7 @@ function main() {
 						// to the app?
 						var error = { status:request.status, 
 								  message:"http GET error response "+request.status+" on "+url };
-						console.log('! query error', error);
+						//console.log('! query error', error);
 						if (msg.onError) {
 							sendToApp({
 								callback:msg.onError,
@@ -152,22 +152,22 @@ function main() {
 				}
 			}
 			request.onabort = function(e) {
-				console.log('request abort', e);
+				//console.log('request abort', e);
 			}
 			request.onerror = function(e) {
-				console.log('request error', e);
+				//console.log('request error', e);
 			}
 			request.loadend = function(e) {
-				console.log('request loadend', e);
+				//console.log('request loadend', e);
 			}
 			request.ontimeout = function(e) {
-				console.log('request timeout', e);
+				//console.log('request timeout', e);
 			}
 			// request.timeout = 1000;
 			// request.responseType = "json";   requires responseText change
 			request.send();
-			console.log('4100', url, request);
-			console.log('...?');
+			//console.log('4100', url, request);
+			//console.log('...?');
 
 			/*
 			  
@@ -181,7 +181,7 @@ function main() {
 		};
 		
 		var handleResponse = function (responseText) {
-			console.log('4300');
+			//console.log('4300');
 			var responseJSON = JSON.parse(responseText);
 
 			// not sure we can safely get it from the header
@@ -193,14 +193,14 @@ function main() {
 				data:responseJSON,
 				elapsed:elapsed
 			}
-			console.log('4320', rmsg);
+			//console.log('4320', rmsg);
 			sendToApp(rmsg);
 
 			var sleepMs = 1000/msg.maxCallsPerSecond - elapsed;
 			setTimeout(doRequest, sleepMs);
 		}
 
-		console.log('4000');
+		//console.log('4000');
 		doRequest();
 
 	}

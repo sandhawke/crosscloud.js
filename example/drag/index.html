@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en-US">
+<head>
+<title>Test</title>
+<script src="http://crosscloud.org/!!VERSION!!/crosscloud.js"></script>
+<script src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
+<script src="main.js"></script>
+<style>
+body { 
+  font-family: Arial; 
+}
+.note {
+  margin: 0;
+  padding-left: 2em;
+  font-size: 85%;
+  font-style: italic;
+}
+table {
+    border-width: 5px;
+}
+thead td {
+  background: #ccc;
+}
+tbody tr th {
+  border-bottom: 1px solid #ccc;
+}
+tbody tr:hover {
+ background: #eee;
+}
+td, th {
+ padding: 2px;
+ padding-left: 6px
+}
+
+</style>
+</head>
+<body>
+  <div id="error">JS Not Running</div>
+  <div>
+
+	<h2>Drag Responsiveness<br/><span style="font-size: 70%; color:gray;">Crosscloud Demo Application</span></h2>
+	
+	<p class="note">Click and drag the mouse pointer anywhere in this window.  You should see some text being dragged along with it, with some lag, since it's being positioned with data from the server.   You'll also see other people dragging text around, too.</p>
+
+	<p>Response time: 
+         min=<span id="min">__</span>ms
+         avg=<span id="avg">__</span>ms
+         max=<span id="max">__</span>ms
+         latest=<span id="latest">__</span>ms
+         l2=<span id="l2">__</span>ms
+         l3=<span id="l3">__</span>ms
+	</p>
+
+	<div id="notLoggedIn">
+	  <p>Not logged in.   Use the pod login control (upper right).</p>
+	</div>
+
+	<div id="field" style="display: none">
+	</div>
+
+  </div>
+</body>
+</html>

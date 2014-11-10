@@ -18,7 +18,7 @@ function main() {
 	var iframeTimeout = null;
 
 	var sendToApp = function (m) {
-		console.log("<<switcherToApp", m);
+		//console.log("<<switcherToApp", m);
 		app.postMessage(m, "*");   // appOrigin?
 	}
 
@@ -44,7 +44,7 @@ function main() {
 		}
 		*/
 
-		console.log('>>switcher received<<', event.data);
+		//console.log('>>switcher received<<', event.data);
 
 		var message = event.data
 		
@@ -54,13 +54,13 @@ function main() {
 
 			var u = localStorage.getItem('selectedPodURL');
 			if (u) {
-				console.log('reconnecting to previously select pod', u);
+				//console.log('reconnecting to previously select pod', u);
 				mode="icon";
 				requestIcon();
 				render();
 				newurl(u);
 			} else {
-				console.log('no connection', u);
+				//console.log('no connection', u);
 				// ?? if (appConfig.useMicropod) {
 
 				mode="panel";
@@ -107,7 +107,7 @@ function main() {
 		onConnected = function () {
 			connected = true;
 			if (timeout) { clearTimeout(timeout); }
-			console.log('x', Date.now()-iframeStart, 'awake', timeout);
+			//console.log('x', Date.now()-iframeStart, 'awake', timeout);
 			setConnectionStatus('pod iframe running', podURL);
 			if (whenDone) whenDone();
 		}
@@ -117,7 +117,7 @@ function main() {
 		var podframeurl = podURL+"/_login/!!VERSION!!/network.html";
 		// during testing
 		//podframeurl = "podlogin.html";
-		console.log(0);
+		//console.log(0);
 		poddiv = document.createElement("div");
 		podiframe = document.createElement("iframe");
 		// only called on unparsable URL; things like 404 are still a load
@@ -125,21 +125,21 @@ function main() {
 			console.log(Date.now()-iframeStart, 'iframe error', e);
 		});
 		podiframe.addEventListener("load", function(e) {
-			console.log(Date.now()-iframeStart, 'iframe loaded', e);
+			//console.log(Date.now()-iframeStart, 'iframe loaded', e);
 			timeout = setTimeout(function() {
 				// BUG: we seem to be getting this randomly in chrome
 				setConnectionStatus('failed', podframeurl);
 			}, 2000);
-			console.log('timeout set', timeout);
+			//console.log('timeout set', timeout);
 		});
-		console.log('GET', podframeurl);
+		//console.log('GET', podframeurl);
 		podiframe.setAttribute("src", podframeurl);
 		podiframe.style.width = "1px";
 		podiframe.style.height = "1px";
 		podiframe.style.overflow = "hidden";
 		poddiv.appendChild(podiframe);
 		document.body.appendChild(poddiv);
-		console.log(1);
+		//console.log(1);
 	}
 
 	var disconnectFromPod = function (m) {
@@ -152,7 +152,7 @@ function main() {
 	}
 
 	var sendToPod = function (m) {
-		console.log("switcherToPod>>", m);
+		//console.log("switcherToPod>>", m);
 		podiframe.contentWindow.postMessage(m, podorigin);
 	}
 
@@ -163,7 +163,7 @@ function main() {
 
 	document.addEventListener("resize", function (event) {
 		// doesn't seem to work
-		console.log("iframe resized");
+		//console.log("iframe resized");
 	});
 
 	var requestLarge = function() {
@@ -235,7 +235,7 @@ function main() {
 	icon.style.alignContent ="space-around";
 	icon.style.textAlign = "center";
 	icon.addEventListener("click", function (e) {	
-		console.log('icon clicked');
+		//console.log('icon clicked');
 		mode = "panel";
 		render();
 		requestLarge();
@@ -283,7 +283,7 @@ function main() {
 			alert("don't use 'demo.fakepods.com' please");
 		}
 
-		console.log('got url', podurl);
+		//console.log('got url', podurl);
 		document.getElementById('podurlprompt').style.display="none";
 
 		var out = document.getElementById('selectedpodurl');
