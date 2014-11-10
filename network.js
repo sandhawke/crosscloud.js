@@ -226,5 +226,3 @@ var onready = function onready() {
 if (typeof document !== "undefined") {
 	onready();
 }
-
-console.log("9000");

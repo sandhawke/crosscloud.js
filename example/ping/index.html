@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en-US">
+<head>
+<title>Ping Your Pod</title>
+<script src="http://crosscloud.org/!!VERSION!!/crosscloud.js"></script>
+<script src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
+<script src="main.js"></script>
+<style>
+p { margin: 0; padding: 0;}
+body { 
+  font-family: Arial; 
+}
+.note {
+  margin: 0;
+  padding-left: 2em;
+  font-size: 85%;
+  font-style: italic;
+}
+table {
+    border-width: 5px;
+}
+thead td {
+  background: #ccc;
+}
+tbody tr th {
+  border-bottom: 1px solid #ccc;
+}
+tbody tr:hover {
+ background: #eee;
+}
+td, th {
+ padding: 2px;
+ padding-left: 6px
+}
+
+</style>
+</head>
+<body>
+  <div id="error">JS Not Running</div>
+  <div>
+
+	<h2>Ping<br/><span style="font-size: 70%; color:gray;">Crosscloud Demo Application</span></h2>
+
+	<div id="notLoggedIn">
+	  <p>Not logged in.   Use the pod login control (upper right).</p>
+	</div>
+
+	<div id="main" style="display: none">
+	  <p>Avg time for pod.push() to complete: <span id="avgp"></span></p> 
+	  <p>Avg time for query.allResults() to be called: <span id="avgq"></span></p> 
+	  <p>Pings completed: <span id="count"></span></p>
+	  <p>--</p>
+	</div>
+  </div>
+</body>
+</html>

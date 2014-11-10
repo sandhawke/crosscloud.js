@@ -1,5 +1,5 @@
 "use strict";
-$(function(){
+if (typeof document !== "undefined") $(function(){
     $("#error").html("");  // clear the "Missing Javascript" error message
 
 	var properties = ["name", "selfDescription"]
