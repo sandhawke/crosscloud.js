@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en-US">
+<head>
+<title>crosscloud.js readme</title>
+<link href="style.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<h1>crosscloud.js  (version !!VERSION!!)</h1>
+
+<p>This library makes it easy for browser apps to persist state,
+sharing with other instances of themselves and with compatible apps.
+The data lives on the user's <em>pod</em>, where it can be read and
+written by all applications (and other people) authorized by the user.
+</p>
+
+<p>Some running examples:</p>
+<table>
+
+<tr>
+  <th><a href="examples/hello">hello</a></th>
+  <td>A version of "Hello World" where you say hello to the whole world (or at least the other folks running this app, using a connected hub)</td>
+</tr>
+
+<tr>
+  <th><a href="examples/profile">profile</a></th>
+  <td>Simple user profile editor</td>
+</tr>
+
+
+<tr>
+  <th><a href="examples/ping">ping</a></th>
+  <td>Show how long it takes for data to be synchronized with the user's pod</td>
+</tr>
+</table>
+
+<p>Basic usage:</p>
+
+<pre>&lt;script src="http://crosscloud.org/!!VERSION!!/crosscloud.js">&lt;/script>
+&lt;script src="https://code.jquery.com/jquery-2.1.1.min.js">&lt;/script>
+&lt;script>
+
+$(function(){
+
+  var pod = crosscloud.connect();
+
+  pod.push({ ... some data item you want to add or update ...})
+  // if it has no _id, then the item is created, and an _id will be added
+  // if it has an _id, then the item will be updated
+
+  pod.query()
+     .onAllResults(function (items) { ... called with matching items ... })
+	 .pattern({ someProperty: "its required value",
+                anotherProperty: "its value",
+			    andAnother: { "$exists": true }  })
+     .start();
+
+  pod.onLogin(function (userPodID) { ... } )
+  pod.onLogout()
+
+}
+&lt;/script>
+
+</pre>
+
+</body>
+</html>
