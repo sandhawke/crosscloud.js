@@ -1,7 +1,7 @@
-= crosscloud.js API Reference
 
+# API Reference: crosscloud.js
 
-== Concepts
+## Concepts
 
 The crosscloud.js library provides simple and efficient access to
 shared data "pages".  Conceptually, a page is both a real Web Page,
@@ -14,16 +14,16 @@ to display the data.
 
 TBD more concept examples
 
-== The global "crosscloud" object
+## Global Object
 
-`
-var pod = crosscloud.connect()
+`javascript
+var pod # crosscloud.connect()
 `
 
 Or, more generally,
 
 `
-var pod = crosscloud.connect(options)
+var pod # crosscloud.connect(options)
 `
 
 Valid options:
@@ -34,33 +34,33 @@ Valid options:
 Also:
 
 `
-var focusPage = crosscloud.focusPage()    # PLANNED
+var focusPage # crosscloud.focusPage()    # PLANNED
 `
 
 If the app has app has been invoked to display the contents of a data-only page, then returns a Page object attached to it.  Returns `null` normally.  In this case calling .connect() is necessary only if data is needed beyond this page.
 
-== The "pod" connection object
+## The "pod" connection object
 
-var page = pod.create()
+var page # pod.create()
 
 or, with options:
 
-var page = pod.create(options)
+var page # pod.create(options)
 
- suggestedName (PLANNED)
+* suggestedName (PLANNED)
 
-     Suggests a name for the new page, usually the last part of the
-     URL.  This is sometimes called the "slug".
+Suggests a name for the new page, usually the last part of the
+URL.  This is sometimes called the "slug".
 
- requiredURL (PLANNED)
+* requiredURL (PLANNED)
 
-     Only create the page if it can be given this URL
+Only create the page if it can be given this URL
 
- inContainer (PLANNED)
+* `inContainer` (PLANNED)
 
-     Require that the page be created in this page container.  Often
-     this is the root of the website where the page should be created,
-     or the URL prefix for the page.
+Require that the page be created in this page container.  Often
+this is the root of the website where the page should be created,
+or the URL prefix for the page.
 
  initialValue (PLANNED)
 
@@ -77,11 +77,11 @@ var page = pod.create(options)
 	 the page, and so might still change, such as access control.
 	 (Details TBD)
 
-var page = pod.open(URL)
+var page # pod.open(URL)
 
 Return a page object for the given URL.  Two calls to this, for the
 same pod object and the same URL will always return the same
-underlying JavaScript object.  That is pod.open(x) === pod.open(x).
+underlying JavaScript object.  That is pod.open(x) ### pod.open(x).
 This property is important because values may be links to pages.
 
 
@@ -98,25 +98,25 @@ pod.onLogout()
 
 pod.onError()
 
-== The Page Object
+## The Page Object
 
 page.close()
 
-== Properties
+## Properties
 
 page.set(prop, val)
 page.get(prop)
 
 page.APPLICATION-PROPERTY-NAME
 
-== Synchronization 
+## Synchronization 
 
 page.push().then(...)
 page.pull().then(...)
 page.sync().then(...)
 page.autosync(maxRate)
 
-== Events
+## Events
 
 page.onUpdate(f)
 
@@ -124,7 +124,7 @@ page.onPropertyUpdate(prop, f)
 
 
 
-== Page Areas
+## Page Areas
 
 A <em>page area</em> is a set of page whose URLs match a defined
 pattern.  For example, the URL RegExp "http(s?)://www\.w3\.org.*"
@@ -138,29 +138,29 @@ etc.
 
 issue: Should we constrain areas to being defined by leading substrings?   RegExps?   Or what?   
 
-=== Defining Areas
+### Defining Areas
 
 Areas are defined using URL-like strings where any substrings
 surrounded by curly braces are taken as wildcards.  An array of these
 strings is taken as the union of the areas covered by each string.
 
-=== LiveCopy
+### LiveCopy
 
 pod.createLiveCopy(oldArea, newArea)
 
-=== Snapshot
+### Snapshot
 
 pod.createSnapshot(oldArea, newArea)
 
-=== DeleteAll
+### DeleteAll
 
 pod.deleteAll(area)
 
-=== DeleteAndRedirect
+### DeleteAndRedirect
 
 pod.deleteAndRedirect(oldArea, newArea)
 
-=== Move
+### Move
 
 pod.move(oldArea, newArea)
 
@@ -170,36 +170,36 @@ Shortcut for createLiveCopy + deleteAndRedirect
 
 
 
-== System Properties 
+## System Properties 
 
 TBD maybe organize these by stability and version?  Or at least
 color-code them?
 
-=== _id or URL   (Status: since 0.1.1)
+### _id or URL   (Status: since 0.1.1)
 
 (external -- can be read even when page cannot be)
 
-=== _owner (Status: since 0.1.1)
+### _owner (Status: since 0.1.1)
 
 (external -- can be read even when page cannot be)
 
-=== public   (Status: planned for 0.3.0)
+### public   (Status: planned for 0.3.0)
 
 (external -- can change even if page is immutable)
 
-=== allowedReaders  (Status: planned for 0.3.0)
+### allowedReaders  (Status: planned for 0.3.0)
 
 (external -- can change even if page is immutable)
 
-=== lastUpdateTime   (Status: planned for 0.3.0)
+### lastUpdateTime   (Status: planned for 0.3.0)
 
-=== lastUpdateCodeOrigin  (Status: planned for 0.3.0)
+### lastUpdateCodeOrigin  (Status: planned for 0.3.0)
 
-=== previousVersion  (Status: being considered)
+### previousVersion  (Status: being considered)
 
 ??? doesn't work with continuous updates
 
-=== keep (Status: being considered)
+### keep (Status: being considered)
 
 number of independent persistant copies to keep
 
@@ -207,17 +207,17 @@ issue: would S3 count as 3 (since amazon replicates it to three data centers) or
 
 (external -- can change even if page is immutable)
 
-=== backups (Status: being considered)
+### backups (Status: being considered)
 
 ? set of the keep>1 URLs
 
 (external -- can change even if page is immutable)
 
-=== timeToLiveInSeconds (Status: planned for 0.3.0)
+### timeToLiveInSeconds (Status: planned for 0.3.0)
 
 (external -- can change even if page is immutable)
 
-=== constant, immutable (Status: being considered)
+### constant, immutable (Status: being considered)
 
 but what about properties that might be derived from external data at
 run time?  what about links to other pages which move?
@@ -225,13 +225,13 @@ run time?  what about links to other pages which move?
 (Maybe the changes have to be documented with isReplacementFor or some
 such?   Eh.    Different applications.)
 
-=== pagesWithSameSubject (Status: being considered)
+### pagesWithSameSubject (Status: being considered)
 
-=== archiveCopyOf (Status: being considered)
+### archiveCopyOf (Status: being considered)
 
-=== liveCopyOf (Status: being considered)
+### liveCopyOf (Status: being considered)
 
-=== dataspec (Status: being considered)
+### dataspec (Status: being considered)
 
 Is this a property, or part of the protocol?
 
