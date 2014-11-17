@@ -2,11 +2,18 @@
 API Reference: crosscloud.js
 ============================
 
+[status: very little of this is implemented yet.]
+
+
+This library provides web applications with simple and efficient
+access to shared data maintained under user control.  Using this
+library, you can build multi-user, highly interactive applications
+without running any servers or having your work under the control of
+anyone but yourself.
+
 
 Concepts
 --------
-
-[status: very little of this is implemented yet.]
 
 This library provides web applications with simple and efficient
 access to shared data maintained under user control.  Using this
@@ -37,28 +44,27 @@ appropriate application when a user double-clicks on a file icon).
 Global Object
 -------------
 
+The library defines one global object, called "crosscloud", which
+offers two methods.
+
 ### crosscloud.connect
 
+Most functionally is obtained via a Pod object, returned by this call.
+The Pod object represents the client side of a connection to the
+current user's data storage service (aka "pod").
 
-The data is usually accessed through a _pod_ object which is a client
-connection to a Personal Online Database (pod) chosen by the user and
-to which the user authenticates.  By convention we call the variable
-which references this connection `pod`, but `conn` or `db` would also
-make sense.
+By convention we call the variable which references this connection
+`pod`, but `conn` or `db` would also make sense.
 
 ```js
 var pod = crosscloud.connect();
-```
-
-Or, more generally,
-
-```js
+// or 
 var pod = crosscloud.connect(options);
 ```
 
 Valid options:
 
-* `required`: boolean, is a connection required for the app to function?  If true, the library block the user from accessing the application when there is no connection to a pod [status: planned]
+* `required`: boolean, is a connection required for the app to function?  If true, the library blocks the user from accessing the application when there is no connection to a pod (eg with a modal login dialog) [status: planned]
 * ` micropodProvider`: URL of a service which is expected to provide minimal pod services to anonymous users, so people can use your application without creating an account [status: planned]
 
 
@@ -295,53 +301,53 @@ page.onPropertyUpdate(prop, f)
 
 
 
-## Page Areas
+Web Trees
+---------
 
-A <em>page area</em> is a theoretic set of pages whose URLs match a defined
-pattern.  For example, the URL RegExp "http(s?)://www\.w3\.org.*"
-defines the page area of the W3C website, and contains all the pages
-on that site.
+(status: under discussion)
 
-Page areas are also considered to contain pages which do not exist.
-This allows for redirection, copying, and watching for possible pages
-without knowing whether they exist, noticing when they are created,
-etc.
+A <em>Web Tree</em> is a set of possible URLs (with their associated
+pages) starting with a common substring.  For example the (not-SSL)
+W3C website occupies the URL tree "http://www.w3.org".  That is, all
+the pages on the site current, or in the future, have URLs starting
+with that string.
 
-Areas are defined using URL-like strings where any substrings
-surrounded by curly braces are taken as wildcards.  An array of these
-strings is taken as the union of the areas covered by each string.
+Web trees include all the URLs starting with the given prefix string,
+even if no page yet exists with that URL.
+
+This API offers several operations on web trees, as follows.
 
 ### LiveCopy
 
 ```js
-pod.createLiveCopy(oldArea, newArea)
+pod.liveCopyTree(oldTree, newTree)
 ```
 
 ### Snapshot
 
 ```js
-pod.createSnapshot(oldArea, newArea)
+pod.snapshotTree(oldTree, newTree)
 ```
 
-### DeleteArea
+### DeleteTree
 
 ```js
-pod.deleteArea(area)
+pod.deleteTree(tree)
 ```
 
 ### DeleteAndRedirect
 
 ```js
-pod.deleteAndRedirect(oldArea, newArea)
+pod.deleteTreeAndRedirect(oldTree, newTree)
 ```
 
 ### Move
 
 ```js
-pod.move(oldArea, newArea)
+pod.moveTree(oldTree, newTree)
 ```
 
-Shortcut for createLiveCopy + deleteAndRedirect
+Shortcut for copy, delete, redirect
 
 
 Other Page Operations
