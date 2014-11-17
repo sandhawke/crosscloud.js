@@ -225,7 +225,7 @@ page.color = "red";
 
 Direct access **cannot add properties**, only access values and change the values of existing properties.   If it is not known whether the property has a value for this page, use page.set() instead. 
 
-Implementation note: this is done using [getters and setters](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/defineProperty) for existing properties.  An attempt to get a non-existant property will return `undefined` whether a getter has been defined.  The problem is an attempt to set a new property will add a new JavaScript property, and we cannot efficiently tell whether this has happened.
+Implementation note: this is done using [getters and setters](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/defineProperty) for existing properties.  An attempt to get a non-existant property will return `undefined` whether or not a getter has been defined.  The problem is an attempt to set a new property will add a new JavaScript property, and we cannot efficiently tell whether this has happened.
 
 ### page.setProperties
 
@@ -249,6 +249,7 @@ var kv = page.getProperties(['prop1', 'prop2', ...])
 Return a simple JavaScript object which has the same data as the Page,
 for the properties given.
 
+ISSUE: should there be an argument-less mode where it returns all properties?  The problem is this can be shockingly expensive, with some values being very large or very hard to compute.
 
 
 
