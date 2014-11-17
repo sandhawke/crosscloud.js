@@ -15,12 +15,6 @@ anyone but yourself.
 Concepts
 --------
 
-This library provides web applications with simple and efficient
-access to shared data maintained under user control.  Using this
-library, you can build multi-user, highly interactive applications
-without running any servers or having your work under the control of
-anyone but yourself.
-
 Our basic model is quite simple (and probably familiar): applications
 store their data in objects that look like JSON documents.  We call
 them "pages", and each one actually is a web page, with a real URL.
