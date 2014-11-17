@@ -21,18 +21,20 @@ them "pages", and each one actually is a web page, with a real URL.
 Of course, they might be private pages, only available to the user who
 created them, if that's what the user wants.
 
-In addition to its URL and access controls, each page is a set of
-property-value pairs.  In your app, you can create these pages, delete
-them, update them, search for them (even ones created by other people
-and other apps), and be notified in real-time when they change.  Your
-app will interoperate with other apps which access the same pages,
-whether written by you or other people.  
+Each page essentially consists of a set of property-value pairs,
+typically conveying information about the page itself and about some
+conceptually entity which is the subject of this page.  In your app,
+you can create these pages, delete them, update them, search for them
+(even ones created by other people and other apps), and be notified in
+real-time when they change.  Your app will interoperate with other
+apps which access the same pages, whether written by you or other
+people.
 
 The pages themselves can be viewed in a regular browser, so users can
-pass around their URLs, pointing to things.  The pages can have static
-content (eg HTML or images), or they can be data rendered live by the
-appropriate application (much like desktop operating systems run an
-appropriate application when a user double-clicks on a file icon).
+link to them, post their URLs, etc, as with other web pages.  The
+pages can have static content (eg HTML or images), or they can be data
+rendered live by an appropriate application (running in 'focus mode',
+as below).
 
 
 Global Object
@@ -69,12 +71,16 @@ Valid options:
 var focusPage = crosscloud.focusPage()    # PLANNED
 ```
 
-Check to see if this application has been invoked to display the
-contents of a data-only page.  Every application capable of displaying
-such pages should call this early in its control flow.
+Check to see if this application is running in _focus mode_ and if so,
+return the focus page.  Focus mode is used to ask the application to
+display a data-only page in a browser, much like a desktop application
+can be invoked to open a file it created.
+
+If you application supports focus mode, it should call this early in
+its control flow, possibly displaying entirely different HTML.
 
 Returns `null` if run normally; returns the Page to display if the
-application was invoked on a page.  In this single-page focus mode, calling
+application was invoked on a page.  In focus mode, calling
 crossloud.connect() is necessary only if other data is also needed (as
 it often is).
 
@@ -178,8 +184,6 @@ Page Properties
 ---------------
 
 These methods allow access to the properties of the Page.
-
-### values
 
 The values for a property can be:
 
