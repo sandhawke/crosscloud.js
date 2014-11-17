@@ -1,132 +1,303 @@
 
-# API Reference: crosscloud.js
+API Reference: crosscloud.js
+============================
 
-## Concepts
 
-The crosscloud.js library provides simple and efficient access to
-shared data "pages".  Conceptually, a page is both a real Web Page,
-and also a shared JSON-style data object.
+Concepts
+--------
 
-Each page has a URL and a set of property-value pairs.  Pages may also
-have "content", which is served to Web clients which try to visit the
-URL.  If not content is defined, typically an application is invoked
-to display the data.
+[status: very little of this is implemented yet.]
 
-TBD more concept examples
+This library provides web applications with simple and efficient
+access to shared data maintained under user control.  Using this
+library, you can build multi-user, highly interactive applications
+without running any servers or having your work under the control of
+anyone but yourself.
 
-## Global Object
+Our basic model is quite simple (and probably familiar): applications
+store their data in objects that look like JSON documents.  We call
+them "pages", and each one actually is a web page, with a real URL.
+Of course, they might be private pages, only available to the user who
+created them, if that's what the user wants.
 
-`javascript
-var pod # crosscloud.connect()
-`
+In addition to its URL and access controls, each page is a set of
+property-value pairs.  In your app, you can create these pages, delete
+them, update them, search for them (even ones created by other people
+and other apps), and be notified in real-time when they change.  Your
+app will interoperate with other apps which access the same pages,
+whether written by you or other people.  
+
+The pages themselves can be viewed in a regular browser, so users can
+pass around their URLs, pointing to things.  The pages can have static
+content (eg HTML or images), or they can be data rendered live by the
+appropriate application (much like desktop operating systems run an
+appropriate application when a user double-clicks on a file icon).
+
+
+Global Object
+-------------
+
+### crosscloud.connect
+
+
+The data is usually accessed through a _pod_ object which is a client
+connection to a Personal Online Database (pod) chosen by the user and
+to which the user authenticates.  By convention we call the variable
+which references this connection `pod`, but `conn` or `db` would also
+make sense.
+
+```js
+var pod = crosscloud.connect();
+```
 
 Or, more generally,
 
-`
-var pod # crosscloud.connect(options)
-`
+```js
+var pod = crosscloud.connect(options);
+```
 
 Valid options:
 
- required boolean, is a connection required for the app to function?
- micropodProvider
-
-Also:
-
-`
-var focusPage # crosscloud.focusPage()    # PLANNED
-`
-
-If the app has app has been invoked to display the contents of a data-only page, then returns a Page object attached to it.  Returns `null` normally.  In this case calling .connect() is necessary only if data is needed beyond this page.
-
-## The "pod" connection object
-
-var page # pod.create()
-
-or, with options:
-
-var page # pod.create(options)
-
-* suggestedName (PLANNED)
-
-Suggests a name for the new page, usually the last part of the
-URL.  This is sometimes called the "slug".
-
-* requiredURL (PLANNED)
-
-Only create the page if it can be given this URL
-
-* `inContainer` (PLANNED)
-
-Require that the page be created in this page container.  Often
-this is the root of the website where the page should be created,
-or the URL prefix for the page.
-
- initialValue (PLANNED)
-
-     The value to set for the page, as if the page were cleated then
-     setProperties were called with this parameter.
-
- constant (PLANNED)
-
-     Take various steps to ensure that the page value can never be
-     changed.  Requires initialValue be specified, since that will be
-     the only value the page ever has.
-
-	 Note that certain properties of a page might not be intrinsic to
-	 the page, and so might still change, such as access control.
-	 (Details TBD)
-
-var page # pod.open(URL)
-
-Return a page object for the given URL.  Two calls to this, for the
-same pod object and the same URL will always return the same
-underlying JavaScript object.  That is pod.open(x) ### pod.open(x).
-This property is important because values may be links to pages.
+* `required`: boolean, is a connection required for the app to function?  If true, the library block the user from accessing the application when there is no connection to a pod [status: planned]
+* ` micropodProvider`: URL of a service which is expected to provide minimal pod services to anonymous users, so people can use your application without creating an account [status: planned]
 
 
-pod.dataspec(dataspec-object-or-URL)    # PLANNED
+### crosscloud.focusPage
 
-pod.disconnect()
 
-pod.query()
-...
+```js
+var focusPage = crosscloud.focusPage()    # PLANNED
+```
 
-pod.onLogin()
+Check to see if this application has been invoked to display the
+contents of a data-only page.  Every application capable of displaying
+such pages should call this early in its control flow.
 
-pod.onLogout()
+Returns `null` if run normally; returns the Page to display if the
+application was invoked on a page.  In this single-page focus mode, calling
+crossloud.connect() is necessary only if other data is also needed (as
+it often is).
 
-pod.onError()
 
-## The Page Object
+Obtaining Pages 
+---------------
 
-page.close()
+### pod.create
 
-## Properties
+Create a new page and return a Page object attached to it.   Unlike with filesystem operations, create() automatically includes a subsequence open().
+
+This operation does not actually communicate with the pod server, and URL will not yet be set upon return.   That is done by page.push or a similar operation.
+
+```js
+var page = pod.create()
+// or 
+var page = pod.create(options)
+```
+
+* `URL` (string) The URL for the new page.   Error if not available. [status: planned]
+* `suggestedName` (string) Suggests a name for the new page, usually the last part of the URL.  This is sometimes called the "slug".  It's fine to includes non-URL characters and trust they will be removed, replaced, or escaped, and otherwise assume any text is safe to use for this.  [status: planned]
+* `inContainer` (string) Require that the page be created in a "container" with this URL.  Often this is the root of the website where the page should be created, or the URL prefix for the page.  [status: being considered]
+* `initialValue` The value to set for the page, as if the page were cleated then setProperties were called with this parameter.  [status: planned]
+* `constant`  Set up the page, to the extent possible, so that its data will never change.  Requires initialValue be specified, since that will be the only value the page ever has. Note that certain properties of a page might not be intrinsic to the page, and so might still change, such as access control. (Details TBD)  [status: being considered]
+
+### pod.open
+
+
+```js
+var page = pod.open(URL)
+```
+
+Return a page object for the given URL.
+
+It is not defined whether two pod.open calls with the same URL
+parameter will always result in the same (===) object being returned,
+so use page.samePageAs(p2) to check for page equality.
+
+
+### pod.query
+
+TBD
+
+Note: does not run any queries until the dom is complete, so it's safe for callbacks to assume dom is fully loaded.
+
+
+Other pod operations
+--------------------
+
+### pod.dataspec
+
+TBD
+
+pod.dataspec(dataspec-object-or-URL)
+
+
+### pod.disconnect
+
+Shut down this connection, completing what began with
+crosscloud.connect().  Not normally needed, since it's normally fine
+to leave the connection active as long as the web app is displayed on
+a page.
+
+
+### pod.onLogin
+
+TBD
+
+
+### pod.onLogout
+
+
+TBD
+
+### pod.onError
+
+Set the error handler to call for any errors not handled by per-page
+error handlers.
+
+TBD
+
+### pod.PageSet
+
+PageSets are used to store multiple page links as one value.
+
+```js
+var s1 = new pod.PageSet(prop)
+```
+
+Creates a new PageSet, indexed by the property indicated by prop.   Prop must be a property that will be defined and different for each member of the set.
+
+ISSUE: should we call this a 'multi' instead of a set, since PageSet and page.set read rather similary?   That is, the word 'set' is perhaps too common.
+
+TBD explain this a lot better
+
+
+
+
+
+Page Properties
+---------------
+
+These methods allow access to the properties of the Page.
+
+### values
+
+The values for a property can be:
+
+* JavaScript String
+* JavaScript Number
+* Page
+* JavaScript Array (of String, Number, or Page)
+* PageSet
+* Set of Strings or Numbers
+
+Sets are JavaScript objects treated as a key-value mapping in a manner determined in the construction of the set.  Sets of strings and numbers use the key as the set element, and the value is `true`.  Sets of pages use some selected property of the page (defaulting to the URL) as the key, and the page itself is the value, as set up by PageSet.
+
+### page.set
 
 page.set(prop, val)
+
+### page.get
+
 page.get(prop)
 
-page.APPLICATION-PROPERTY-NAME
+### direct access
 
-## Synchronization 
+In general, Pages may be treated as JavaScript objects, and properties may be accessed directly, instead of through the `get` and `set` methods.  For example:
 
+```js
+var v1 = page.get("color");
+// same as
+var v2 = page.color;
+// v1 === v2
+```
+
+and
+
+```js
+page.set("color", "red");
+// same as
+page.color = "red";
+```
+
+Direct access **cannot add properties**, only access values and change the values of existing properties.   If it is not known whether the property has a value for this page, use page.set() instead. 
+
+Implementation note: this is done using [getters and setters](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/defineProperty) for existing properties.  An attempt to get a non-existant property will return `undefined` whether a getter has been defined.  The problem is an attempt to set a new property will add a new JavaScript property, and we cannot efficiently tell whether this has happened.
+
+### page.setProperties
+
+```js
+page.setProperties({prop1: val1, prop2:val2})
+```
+
+Essentially shorthand for `page.set(prop1, val1); page.set(prop2, val2);` but more efficient and guarantees the changes are all propagated together.
+
+### page.getProperties
+
+```js
+var kv = page.getProperties(['prop1', 'prop2', ...])
+//
+// like
+//    kv.prop1 = page.prop1
+//    kv.prop2 = page.prop2
+//     ...
+```
+
+Return a simple JavaScript object which has the same data as the Page,
+for the properties given.
+
+
+
+
+Synchronization 
+---------------
+
+### page.push
+
+```js
 page.push().then(...)
+```
+
+### page.pull
+
+```js
 page.pull().then(...)
+```
+
+
+### page.sync
+
+```js
 page.sync().then(...)
+```
+
+
+###  page.autosync
+
+```js
 page.autosync(maxRate)
+```
 
-## Events
 
+Notifications
+-------------
+
+### page onUpdate
+
+```js
 page.onUpdate(f)
+```
 
+### page.OnPropertyUpdate
+
+```js
 page.onPropertyUpdate(prop, f)
+```
 
 
 
 ## Page Areas
 
-A <em>page area</em> is a set of page whose URLs match a defined
+A <em>page area</em> is a theoretic set of pages whose URLs match a defined
 pattern.  For example, the URL RegExp "http(s?)://www\.w3\.org.*"
 defines the page area of the W3C website, and contains all the pages
 on that site.
@@ -136,70 +307,91 @@ This allows for redirection, copying, and watching for possible pages
 without knowing whether they exist, noticing when they are created,
 etc.
 
-issue: Should we constrain areas to being defined by leading substrings?   RegExps?   Or what?   
-
-### Defining Areas
-
 Areas are defined using URL-like strings where any substrings
 surrounded by curly braces are taken as wildcards.  An array of these
 strings is taken as the union of the areas covered by each string.
 
 ### LiveCopy
 
+```js
 pod.createLiveCopy(oldArea, newArea)
+```
 
 ### Snapshot
 
+```js
 pod.createSnapshot(oldArea, newArea)
+```
 
-### DeleteAll
+### DeleteArea
 
-pod.deleteAll(area)
+```js
+pod.deleteArea(area)
+```
 
 ### DeleteAndRedirect
 
+```js
 pod.deleteAndRedirect(oldArea, newArea)
+```
 
 ### Move
 
+```js
 pod.move(oldArea, newArea)
+```
 
 Shortcut for createLiveCopy + deleteAndRedirect
 
 
+Other Page Operations
+---------------------
+
+
+### page.close
+
+Free up resources allocated by pod.create or pod.open
 
 
 
-## System Properties 
 
-TBD maybe organize these by stability and version?  Or at least
-color-code them?
+System Properties 
+-----------------
 
-### _id or URL   (Status: since 0.1.1)
+These are the properties of pages which the library and/or pod server
+pays attention to.
+
+
+### _id or URL
 
 (external -- can be read even when page cannot be)
 
-### _owner (Status: since 0.1.1)
+### _owner
 
 (external -- can be read even when page cannot be)
 
-### public   (Status: planned for 0.3.0)
+### public
 
 (external -- can change even if page is immutable)
 
-### allowedReaders  (Status: planned for 0.3.0)
+### allowedReaders  
 
 (external -- can change even if page is immutable)
 
-### lastUpdateTime   (Status: planned for 0.3.0)
+### lastUpdateTime   
 
-### lastUpdateCodeOrigin  (Status: planned for 0.3.0)
+### lastUpdateCodeOrigin
 
-### previousVersion  (Status: being considered)
+
+
+System Properties: Under Consideration
+--------------------------------------
+
+### previousVersion
 
 ??? doesn't work with continuous updates
 
-### keep (Status: being considered)
+### keep
 
 number of independent persistant copies to keep
 
@@ -207,17 +399,19 @@ issue: would S3 count as 3 (since amazon replicates it to three data centers) or
 
 (external -- can change even if page is immutable)
 
-### backups (Status: being considered)
+### backups
 
 ? set of the keep>1 URLs
 
 (external -- can change even if page is immutable)
 
-### timeToLiveInSeconds (Status: planned for 0.3.0)
+### TTL
+
+Number of seconds until automatically deleted
 
 (external -- can change even if page is immutable)
 
-### constant, immutable (Status: being considered)
+### constant
 
 but what about properties that might be derived from external data at
 run time?  what about links to other pages which move?
@@ -225,13 +419,13 @@ run time?  what about links to other pages which move?
 (Maybe the changes have to be documented with isReplacementFor or some
 such?   Eh.    Different applications.)
 
-### pagesWithSameSubject (Status: being considered)
+### pagesWithSameSubject
 
-### archiveCopyOf (Status: being considered)
+### archiveCopyOf
 
-### liveCopyOf (Status: being considered)
+### liveCopyOf
 
-### dataspec (Status: being considered)
+### dataspec
 
 Is this a property, or part of the protocol?
 
