@@ -136,6 +136,13 @@ TBD
 
 pod.dataspec(dataspec-object-or-URL)
 
+It'd be nice to allow:
+
+pod.vocabspec.properties.color.definition = "The wavelenght spectrum etc etc etc"
+
+This ends up minting a URL for this color property, and making it
+known as "color" for the rest of this session.
+
 
 ### pod.disconnect
 
@@ -226,6 +233,9 @@ page.color = "red";
 Direct access **cannot add properties**, only access values and change the values of existing properties.   If it is not known whether the property has a value for this page, use page.set() instead. 
 
 Implementation note: this is done using [getters and setters](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/defineProperty) for existing properties.  An attempt to get a non-existant property will return `undefined` whether or not a getter has been defined.  The problem is an attempt to set a new property will add a new JavaScript property, and we cannot efficiently tell whether this has happened.
+
+ISSUE: Chaining.  We can only do page.prop1.prop2.prop3, ... if those things are already loaded.   So the safe thing to do would be page1.prop2.pull().then( use .prop3 ).   If you just do page.prop1.prop2 I guess we should throw an error or something.  Maybe something like: page.get(p1, p2, p3).then(...)     Maybe:  page.chain.p1.p2.p3.p4.then(...)  which works by chain returning an object with a getter for every term in the vocab.
+
 
 ### page.setProperties
 
