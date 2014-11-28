@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en-US">
+<head>
+<title></title>
+<script src="podlogin-iframe.js"></script>
+</head>
+<body>
+
+  <div id="error">Configuration Error</div>
+
+  <div id="icon" style="display:none"></div>
+  
+  <div id="panel">
+	<div style="float:right" id="x">[X]</div>
+	
+	<h2>Crosscloud Pod Control (Early Draft Version)</h2>
+
+	<div id="podurlprompt">
+
+	  <p>
+	  You need a <i>Crosscloud Pod</i> in order to use this
+	  application.  For now, you can get one by making up a URL like
+	  http://mynickname.fakepods.com.
+	  </p>
+
+	  <p> Your Pod URL: <input id="podurl" type="text"
+	  size="30"></input>
+      </p>
+
+	</div>
+
+	<div id="selectedpod" style="display:none">Currently selected pod:
+	<span style="font-family: monospace; color: green;"
+	id="selectedpodurl">none</span> <button type="button"
+	id="changepodbutton">change</button>
+	</div>
+
+	<p id="podprogress" style="display:none"></p>
+
+  </div>
+</body>
+</html>

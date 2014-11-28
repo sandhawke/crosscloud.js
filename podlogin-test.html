@@ -21,6 +21,9 @@
 <p>Find out current UserID (if any)</p>
 
 <pre class="test">
+// Just in case the user running this test is actually logged in
+podlogin.simulateLogout()
+
 print(podlogin.getUserID());
 // => undefined
 
@@ -87,9 +90,18 @@ User logged in: http://charlie.example
 */
 </pre>
 
+<h2>Force Logout</h2>
+
+<p>This is just so we can really test the UI, but it's flakey as heck.</p>
+
 <pre class="test">
 podlogin.simulateLogout();
+wait(function () { return podlogin.getUserID() === undefined }, 10000); // up to ten seconds
 // => User logged out
+
+// just for use in tests
+podlogin.forceLogout();
+// => 
 </pre>
 
 
@@ -97,13 +109,15 @@ podlogin.simulateLogout();
 
 <p>This test requires you login to the test account, <b><em><tt>http://test.databox1.com</tt></em></b>.  When ready, click the button.</p>
 
-<button type="button" id="login-1">begin test: user login</button>
+<button type="button" id="login-1">login to complete test</button>
+
 <pre class="test">
+// When you click that button, we'll signal login-is-required
 document.getElementById("login-1").addEventListener("click", function(){
    podlogin.requireLogin();
 });
 
-wait(function () { return podlogin.getUserID() }, 600000); // up to ten minutes
+wait(function () { return podlogin.getUserID() }, 10000); // up to ten minutes
 // => User logged in: http://test.databox1.com
 </pre>
 
