@@ -193,7 +193,7 @@
 			
 			if (event.origin !== safeOrigin) return;
 			
-			//console.log("app<< ", event.data);
+			console.log("app<< ", event.data);
 			
 			if (event.data.op === "controlIFrame") {
 				iframeSetProperties(event.data.properties);

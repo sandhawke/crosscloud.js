@@ -191,12 +191,24 @@ var init = function () {
 			// actually this hostname seems to misbehave in chrome
 			alert("don't use 'demo.fakepods.com' please");
 		}
+		podURL = podurl; // probably don't want this, but don't want TWO EVETNS with blur...
+
+
+		// TODO: validate the URL
+		// like via an ajax call, or a popup, or something.
+		//
+		// really we want to get an authcode from it which we can
+		// send, but that's going to need a popup, I think.
+
+		// var win = window.open(podurl, "_blank", "resizable,scrollbars,status,location");
+
 		useURL(podurl);
+
 		becomeIcon();
 	};
 
 	var useURL = function (podurl) {
-		podURL = podURL;
+		podURL = podurl;
 
 		document.getElementById('podurlprompt').style.display="none";
 

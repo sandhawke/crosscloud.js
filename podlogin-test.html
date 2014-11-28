@@ -95,13 +95,14 @@ User logged in: http://charlie.example
 <p>This is just so we can really test the UI, but it's flakey as heck.</p>
 
 <pre class="test">
-podlogin.simulateLogout();
-wait(function () { return podlogin.getUserID() === undefined }, 10000); // up to ten seconds
+// podlogin.simulateLogout();
+
+wait(function () { return podlogin.getUserID() === undefined }, 20000);
 // => User logged out
 
 // just for use in tests
-podlogin.forceLogout();
-// => 
+//podlogin.forceLogout();
+//   // => 
 </pre>
 
 
