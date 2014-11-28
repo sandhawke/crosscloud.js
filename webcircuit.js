@@ -108,7 +108,11 @@ var WebCircuit = function (addr) {
     wc.connect = function (addr) {
         if (wc.ws !== null) throw "already connected";
 
-        wc.ws = new WebSocket(addr);
+		if (typeof window === "undefined") {
+			wc.ws = new WebSocket(addr, {origin:"file:"});
+		} else {
+			wc.ws = new WebSocket(addr);
+		}
         var s = wc.ws;
 
         s.onerror = function(e) { 
