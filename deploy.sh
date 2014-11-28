@@ -17,11 +17,13 @@ echo VERSION=$VERSION
 # http://www.jshint.com/docs/
 
 echo "checking syntax..."
-for jsfile in *.js */*.js */*/*.js; do
-   if ! node $jsfile; then
-      # exit 1
-	   echo Be Careful
-   fi
+# for jsfile in *.js */*.js */*/*.js; do
+for jsfile in podlogin.js podlogin-iframe.js; do
+   #if ! node $jsfile; then
+   #   # exit 1
+   #   echo Be Careful
+   #fi
+   jshint $jsfile
 done
 
 echo "replacing !!VERSION!!..."
