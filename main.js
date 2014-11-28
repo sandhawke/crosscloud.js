@@ -15,6 +15,13 @@
 /*global WebCircuit*/
 /*global exports*/
 
+var mainPod;  // for debugging, so I can get it from the console
+
+if (typeof require !== 'undefined') {  
+	var WebCircuit = require('./webcircuit').WebCircuit;
+	var podlogin = require('podlogin');
+}
+
 (function(exports){
 
     exports.version = '!!VERSION!!';
@@ -36,7 +43,7 @@
             // page...
             // .... pod.disconnect();
         });
-		window.mainPod = pod;   // for debugging, at least
+		mainPod = pod;   // for debugging, at least
         return pod;
     };
 
@@ -47,15 +54,18 @@
     
         this.wc = new WebCircuit();
         this.buffer = [];
-		this.onLogin;
     };
 
     var pod = exports.PodClient.prototype;
 
+	pod.onLogin = podlogin.onLogin;
+	/*
 	pod.onLogin = function (f) {
 		pod.onLogin = f;
 		if (this.podURL) f(this.podURL);
 	}
+	*/
+
 	pod.requireLogin = function (f) {
 		podlogin.requireLogin();
 	}
@@ -63,9 +73,6 @@
     pod.connect = function (addr) {
         this.podURL = addr;
         this.wc.connect(hubAddr(addr));
-		if (this.onLogin) {
-			this.onLogin(this.podURL);
-		}
     };
 
     // http://foo.bar       =>  ws://foo.bar/.well-known/podsocket/v1

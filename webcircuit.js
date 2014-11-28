@@ -32,9 +32,18 @@
 
   */
 
-/*jslint browser:true*/
+/*jslint browser:false*/
 /*jslint devel:true*/
+
+/*global WebSocket*/
+if (typeof WebSocket === 'undefined') {  
+	var WebSocket = require('ws');
+}
+
 /*global Promise*/
+if (typeof Promise === 'undefined') {
+	var Promise = require('promise');
+}
 
 var WebCircuit = function (addr) {
     "use strict";
@@ -103,8 +112,9 @@ var WebCircuit = function (addr) {
         var s = wc.ws;
 
         s.onerror = function(e) { 
-            //console.log('err', e, ""+e) 
+            console.log('err', e, ""+e); 
             tellAll('err',{});
+			// FIXME: how to get this back to someone who will notice/care???
 			throw new Error('websocket error', e);
         }; 
         s.onclose = function() { 
@@ -143,3 +153,7 @@ var WebCircuit = function (addr) {
     if (addr) wc.connect(addr);
 
 };
+
+if (typeof exports !== 'undefined') {
+	exports.WebCircuit = WebCircuit;
+}
