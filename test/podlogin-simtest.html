@@ -1,0 +1,97 @@
+<DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>podlogin.js api summary and tests</title>
+    <script src="../doctest/doctest.js"></script>
+    <link href="../doctest/doctest.css" rel="stylesheet" />
+    <script src="../podlogin.js"></script>
+	<style>
+	  .doctest-report {
+	     display: block;
+      }
+	</style>
+  </head>
+  <body class="autodoctest">
+
+<p>This show the API calls in podlogin.js and tests them in your browser.</p>
+
+<p>This does NOT actually test the iframe and dialog boxes, so it can
+run without any user help.</p>
+
+<h2>getUserID</h2>
+
+<p>Find out current UserID (if any)</p>
+
+<pre class="test">
+// Just in case the user running this test is actually logged in
+podlogin.simulateLogout()
+
+print(podlogin.getUserID());
+// => undefined
+
+// this is just for testing/demo
+podlogin.simulateLogin("http://alice.example");
+
+// but then you can see it like this:
+print(podlogin.getUserID());
+// => http://alice.example
+
+podlogin.simulateLogout();
+print(podlogin.getUserID());
+// => undefined
+
+</pre>
+
+<h2>onLogin, onLogout</h2>
+
+<p>Callbacks for when the user logs in or out</p>
+
+<pre class="test">
+podlogin.onLogin(function (u) { 
+  print("User logged in: "+u)
+});
+
+podlogin.simulateLogin("http://alice.example");
+// => User logged in: http://alice.example
+
+podlogin.onLogout(function () {
+  print("User logged out");
+});
+
+podlogin.simulateLogout();
+// => User logged out
+</pre>
+
+<h2>Multiple handlers</h2>
+
+<p>Added in order, like you'd expect</p>
+
+<pre class="test">
+var handler2 = function (u) { 
+  print("Second handler for user log in: "+u)
+};
+podlogin.onLogin(handler2);
+
+podlogin.simulateLogin("http://bob.example");
+/* => 
+User logged in: http://bob.example
+Second handler for user log in: http://bob.example
+*/
+
+</pre>
+
+<p>We can remove a handler, and we always get a logout before the next login</p>
+
+<pre class="test">
+podlogin.removeOnLogin(handler2);
+
+podlogin.simulateLogin("http://charlie.example");
+/* => 
+User logged out
+User logged in: http://charlie.example
+*/
+</pre>
+
+  </body>
+</html>

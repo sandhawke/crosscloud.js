@@ -1,0 +1,83 @@
+<DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>podlogin.js api summary and tests</title>
+    <script src="../doctest/doctest.js"></script>
+    <link href="../doctest/doctest.css" rel="stylesheet" />
+    <script src="../podlogin.js"></script>
+	<style>
+	  .doctest-report {
+	     display: block;
+      }
+	</style>
+  </head>
+  <body class="autodoctest">
+
+<p>This show the API calls in podlogin.js and tests them in your browser.</p>
+
+<p>In this case, it depends on real user actions, so you have to click the right stuff to pass the test.</p>
+
+<h2>Monitor Stuff</h2>
+
+<pre class="test">
+podlogin.onLogin(function (u) { 
+  print("User logged in: "+u)
+});
+
+podlogin.onLogout(function () {
+  print("User logged out");
+});
+
+// => ...
+</pre>
+
+<h2>Talking to the iframe</h2>
+
+<pre class="test">
+// first let's get any login/logout events based on 
+// whether you (the person running this test) is
+// logged in
+wait(function () { return true }, 100);
+// => ...
+</pre>
+
+
+<h2>Force Logout</h2>
+
+<pre class="test">
+if (podlogin.getUserID()) {
+
+  // just for use in tests
+  podlogin.forceLogout();
+  wait(function () { return podlogin.getUserID() === undefined }, 20000);
+}
+// => ...
+
+print(podlogin.getUserID());
+// => undefined
+
+</pre>
+
+
+<h2>Real UI</h2>
+
+<p>This test requires you login to the test account, <b><em><tt>http://test.databox1.com</tt></em></b>.  When ready, click the button.</p>
+
+<button type="button" id="login-1">login to complete test</button>
+
+<pre class="test">
+// When you click that button, we'll signal login-is-required
+document.getElementById("login-1").addEventListener("click", function(){
+   podlogin.requireLogin();
+});
+
+wait(function () { return podlogin.getUserID() }, 60000);
+// => User logged in: http://test.databox1.com
+</pre>
+
+
+
+
+  </body>
+</html>
