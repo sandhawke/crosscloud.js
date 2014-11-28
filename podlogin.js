@@ -36,7 +36,6 @@
 	};
 
 	exports.requireLogin = function () {
-		// gotLogin("http://test.databox1.com");
 		send({op:'requireLogin'});
 		// (disable this window until we get it?)
 	};
@@ -193,7 +192,7 @@
 			
 			if (event.origin !== safeOrigin) return;
 			
-			//console.log("app<< ", event.data);
+			console.log("app<< ", event.data);
 			
 			if (event.data.op === "controlIFrame") {
 				iframeSetProperties(event.data.properties);
