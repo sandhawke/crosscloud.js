@@ -27,15 +27,25 @@ if (typeof document !== "undefined") $(function(){
 
     });
 
+	var mouseDown = 0;
 	document.addEventListener('mousedown', function (e) {
 		pod.push(me);
+		++mouseDown;
+	});
+	document.addEventListener('mouseup', function (e) {
+		--mouseDown;
 	});
 
 	document.addEventListener('mousemove', function (e) {
-		if (me._id && e.buttons) {
+		if (!me._id) return;  // ignore until initial push is done
+
+		// firefox defines e.buttons, chrome use e.which ?!
+		if ( (e.buttons === undefined && e.which)
+			 || e.buttons ) {
+
 			me.x = e.clientX;
 			me.y = e.clientY;
-			//console.log(me);
+			// console.log(me, e);
 			if (me.now === undefined) {
 				// don't set it if it's already set, since that means
 				// we'd be overwriting an experiment in progress
@@ -49,6 +59,7 @@ if (typeof document !== "undefined") $(function(){
 				$('#l3').html(new Date() - now2);
 			});
 		}
+		return false;  // avoid folks selecting text
 	});
 
 	var divs = {};
@@ -58,7 +69,15 @@ if (typeof document !== "undefined") $(function(){
 	var gotPoints = function (points) {
 		// console.log('got points', points);
 		// only show things recently modified...?
+		var now = new Date();
 		points.forEach( function (point) {
+
+			// alas, this won't re-run if we're just sitting there.
+			var when = new Date(point._lastModified);
+			if ((now - when) > 5) {
+				return
+			}
+
 			var div = divs[point._id];
 			// console.log(point, div);
 			if (div === undefined) {
@@ -74,7 +93,7 @@ if (typeof document !== "undefined") $(function(){
 			div.style.top = ""+point.y+"px";
 
 			if (point._id === me._id) {
-				div.style.border="1px solid green;";
+				div.style.border="1px solid green";
 				// is it possible "me" has been tagged since then?
 				if (me.now) {
 					var delay = new Date() - new Date(me.now);
@@ -86,12 +105,12 @@ if (typeof document !== "undefined") $(function(){
 					}
 					count += 1;
 					total += delay;
-					avg = Math.floor(total/count);	
+					var avg = Math.floor(total/count);	
 					$('#min').html(dmin);
 					$('#avg').html(avg);
 					$('#max').html(dmax);
 					$('#latest').html(delay);
-					console.log(count, total, dmin, avg, dmax, delay);
+					// console.log(count, total, dmin, avg, dmax, delay);
 					me.now = undefined;
 				}
 			}
