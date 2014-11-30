@@ -1,0 +1,43 @@
+#!/usr/bin/env node
+
+var crosscloud = require('crosscloud')
+
+crosscloud.connect().then(function (pod) {
+		
+	var op = process.argv[2];
+	var data = process.argv[3];
+	
+	if (op === undefined) {
+		// maybe do REPL?
+		// consider http://derickbailey.com/2014/07/02/build-your-own-app-specific-repl-for-your-nodejs-app/
+		console.log("usage: podsocket OP [DATA]");
+		process.exit(1);
+	}
+	if (data === undefined) {
+		data = {};
+	} else {
+		data = JSON.parse(data);
+	}
+	
+	var eventHandler = function (event, arg) {
+		console.log('EVENT: ', event, arg);
+	};
+	
+	pod.wc.send(op, data, eventHandler)
+		.then(function(data) {
+			console.log('RESULT: ', JSON.stringify(data,undefined,4));
+			process.exit(0);
+		})
+		.catch(function(data) {
+			console.log('ERROR: ', data);
+			process.exit(1);
+		})
+    })
+	.catch(function (err) {
+		console.log(err.target.url+": "+err)
+		process.exit(1);
+	});
+
+
+
+

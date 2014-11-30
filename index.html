@@ -5,7 +5,7 @@
 <link href="style.css" rel="stylesheet" type="text/css" />
 </head>
 <body>
-<h1>crosscloud.js  (version !!VERSION!!)</h1>
+<h1>crosscloud.js  (version 0.1.2)</h1>
 
 <p>This library makes it easy for browser apps to persist state,
 sharing with other instances of themselves and with compatible apps.
@@ -17,25 +17,33 @@ written by all applications (and other people) authorized by the user.
 <table>
 
 <tr>
-  <th><a href="examples/hello">hello</a></th>
+  <th><a href="example/hello">hello</a></th>
   <td>A version of "Hello World" where you say hello to the whole world (or at least the other folks running this app, using a connected hub)</td>
 </tr>
 
 <tr>
-  <th><a href="examples/profile">profile</a></th>
+  <th><a href="example/profile">profile</a></th>
   <td>Simple user profile editor</td>
 </tr>
 
 
 <tr>
-  <th><a href="examples/ping">ping</a></th>
+  <th><a href="example/ping">ping</a></th>
   <td>Show how long it takes for data to be synchronized with the user's pod</td>
 </tr>
+
+
+<tr>
+  <th><a href="example/drag">drag</a></th>
+  <td>Multi-user drag items around on the screen</td>
+</tr>
+
+
 </table>
 
 <p>Basic usage:</p>
 
-<pre>&lt;script src="http://crosscloud.org/!!VERSION!!/crosscloud.js">&lt;/script>
+<pre>&lt;script src="http://crosscloud.org/0.1.2/crosscloud.js">&lt;/script>
 &lt;script src="https://code.jquery.com/jquery-2.1.1.min.js">&lt;/script>
 &lt;script>
 
@@ -61,6 +69,14 @@ $(function(){
 &lt;/script>
 
 </pre>
+
+<h2>Issues</h2>
+
+<p>Longpoll causes lock-up when browsers 6 connections are used up.  Switch to websockets.</p>
+
+<p>Users need hand-holding on getting a pod</p>
+
+<p>Needs DELETE, and maybe some kind of cleanup auto-expiration (TTL</p>
 
 </body>
 </html>

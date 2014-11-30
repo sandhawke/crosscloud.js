@@ -1,4 +1,6 @@
 /*
+  (should probably be renamed rpcev (for rpc+events) or something, and
+  look more like jsonrpc2.0.)
 
   A WebCircuit is like a WebSocket, except that wc.send() offers some
   hooks for callbacks, so the response(s) to this particular send()
@@ -56,6 +58,7 @@ var WebCircuit = function (addr) {
     wc.globalSeq=1;
     wc.open=false;
     wc.wsq=[];
+	wc.onerror=null;
 
     wc.finalHandler={};
     wc.pushHandler={};
@@ -93,6 +96,7 @@ var WebCircuit = function (addr) {
                 }
             };
         });
+		p.seq = mySeq;
         return p;
     };
 
@@ -116,9 +120,16 @@ var WebCircuit = function (addr) {
         var s = wc.ws;
 
         s.onerror = function(e) { 
-            console.log('err', e, ""+e); 
             tellAll('err',{});
 			// FIXME: how to get this back to someone who will notice/care???
+			if (wc.onerror) {
+				wc.onerror(e);
+				return;
+			}
+			if (e.code === 'ECONNREFUSED') {
+				// node.js server not answering
+				// throw e;
+			}
 			throw new Error('websocket error', e);
         }; 
         s.onclose = function() { 
@@ -130,7 +141,7 @@ var WebCircuit = function (addr) {
             var msg = JSON.parse(e.data);
             var seq = msg.inReplyTo;
             if (msg.final) {
-				console.log('calling .then/.catch', msg.op, msg.data);
+				// console.log('calling .then/.catch', msg.op, msg.data);
                 wc.finalHandler[seq](msg.op, msg.data);
                 delete wc.finalHandler[seq];
                 delete wc.pushHandler[seq];

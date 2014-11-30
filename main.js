@@ -11,9 +11,9 @@
 
 */
 
-/*global podlogin*/
-/*global WebCircuit*/
 /*global exports*/
+/*global require*/
+/*global console*/
 
 var mainPod;  // for debugging, so I can get it from the console
 
@@ -51,9 +51,20 @@ if (typeof require !== 'undefined') {
         if ( !(this instanceof PodClient) ) {
             throw new Error("Constructor called as a function. Must use 'new'");
         }
-    
-        this.wc = new WebCircuit();
-        this.buffer = [];
+
+		var pod = this;
+        pod.wc = new WebCircuit();
+		pod.wc.onerror = function (err) {
+			if (pod.onerror) {
+				pod.onerror(err)
+			} else {
+				console.log("uncaught network/protocol error", err);
+				// maybe do a dom popup to show this?
+				// or use a div if they gave us one?
+				// in node.js maybe halt
+			}
+		}
+        pod.buffer = [];
     };
 
     var pod = exports.PodClient.prototype;
@@ -66,14 +77,32 @@ if (typeof require !== 'undefined') {
 	}
 	*/
 
-	pod.requireLogin = function (f) {
+	pod.requireLogin = function () {
 		podlogin.requireLogin();
-	}
+	};
+
+	// legacy -- this can't every happen
+	pod.onLogout = function() {};
 
     pod.connect = function (addr) {
         this.podURL = addr;
         this.wc.connect(hubAddr(addr));
+		// this is a stop-gap, because we don't actually
+		// have users creating their own pods yet
+		this.wc.send("login", {userId:addr});
     };
+
+	// lousy partial implementation of promise
+	pod.catch = function (f) {
+		this.onerror = f;
+		return pod;
+	}
+	pod.then = function (f) {
+		var pod = this;
+		podlogin.requireLogin();
+		podlogin.onLogin(function() { f(pod) });
+		return pod;
+	}
 
     // http://foo.bar       =>  ws://foo.bar/.well-known/podsocket/v1
     // http://foo.bar/      =>  ws://foo.bar/.well-known/podsocket/v1
@@ -89,34 +118,56 @@ if (typeof require !== 'undefined') {
             throw new Error("bad pod URL syntax");
         }
     };
+    var userNameRE1 = new RegExp("^http(s?)://localhost(:[^/]*)?/pod/([^/]*).*$");
+    var userNameRE2 = new RegExp("^http(s?)://([^.]*).*$");
+    var userName = function (addr) {
+        if (userNameRE1.test(addr)) {
+            var x = addr.replace(userNameRE1, "$3");  
+			return x;
+		} else if (userNameRE2.test(addr)) {
+            var x = addr.replace(userNameRE2, "$2");  
+			return x;
+        } else {
+            throw new Error("bad pod URL syntax", addr);
+        }
+    };
 
 
 
     var Query = function (onPod) { 
         this.pod = onPod;
-        this.msg = { maxCallsPerSecond:20 };
+        this.msg = { maxCallsPerSecond: 20, 
+					 events: {},
+					 inContainer: onPod.podURL };
+		this.allResultsCallbacks = [];
     };
     Query.prototype.filter = function (p) {
         this.msg.filter = p;
         return this;
     };
     Query.prototype.onAllResults = function (c) {
-        if (this.msg.onAllResults) {
-            delete this.pod.callbacks[this.msg.onAllResults];
-        }
-        this.msg.onAllResults = this.pod._newCallback(function (msg) {
-            c(msg.data._members);
-        });
+		this.allResultsCallbacks.push(c);
+		this.msg.events.AllResults = true;
         return this;
     };
     Query.prototype.start = function () {
-        this.msg.op = 'start-query';
-        this.pod._sendToPod(this.msg);
+		var query = this;
+		var eventHandler = function (event, arg) {
+			if (event === "AllResults") {
+				query.allResultsCallbacks.forEach(function (cb) {
+					cb(arg);
+				});
+			} else {
+				// else ignore this event
+				console.log('ignoring event', event, arg);
+			}
+		};
+		this.promise=this.pod.wc.send("startQuery", this.msg, eventHandler);
+		this.seq=this.promise.seq;
         return this;
     };
     Query.prototype.stop = function () {
-        this.msg.op = 'stop-query';
-        this.pod._sendToPod(this.msg);
+		this.pod.wc.send("stopQuery", {originalSeq:this.seq});
         return this;
     };
                         
@@ -196,7 +247,11 @@ if (typeof require !== 'undefined') {
             promise = this.wc.send("update", data);
         } else {
             promise = this.wc.send("create", {inContainer:this.podURL,
-                                              initialData:data});
+                                              initialData:data})
+				.then(function (a) {
+					data._etag = a._etag;
+					data._id = a._id;
+				});
         }
         if (cb) promise.then(cb);
         // how to report uncaught errors...???
@@ -207,7 +262,16 @@ if (typeof require !== 'undefined') {
     };
 
     pod.pull = function (data, cb) {
-        var promise = this.wc.send("read", data);
+        var promise = this.wc.send("read", data)
+			.then(function (overlay) {
+				// clear own properties first, so unnamed ones go away
+				// but we keep the same object
+				for (var prop in data) {
+					if (data.hasOwnProperty(prop)) delete data[prop];
+				}
+				applyOverlay(data, overlay);
+			});
+		
         if (cb) promise.then(cb);
         return promise;
     };

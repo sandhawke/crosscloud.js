@@ -154,7 +154,7 @@ var init = function () {
 			becomeIcon();
 		});
 
-		podurlElement = document.getElementById('podurl');
+		podurlElement = document.getElementById('podurl_v020');
 		podurlElement.addEventListener("keypress", function(e) {
 			var key = e.which || e.keyCode;
 			if (key == 13) {

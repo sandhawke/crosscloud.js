@@ -9,6 +9,8 @@ servers.
 
 0.2.1
 
+		big data values (eg pictures)   (?binary data values?)
+
 		single-item mode (aka focus mode, aka skins)
 
 		delete
