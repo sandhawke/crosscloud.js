@@ -1,0 +1,159 @@
+
+*** 0.1.3 RELEASE NOTES
+
+TO INSTALL: in your application HTML change:
+
+<script src="http://crosscloud.org/0.1.2/crosscloud.js"></script>
+to
+<script src="http://crosscloud.org/!!VERSION!!/crosscloud.js"></script>
+
+
+    *IMPORTANT*: You will need to use a different server, not
+    fakepods.com.  THE NEW SERVER IS DATABOX1.COM
+
+				  => DATABOX1X for beta1
+
+    This release includes a massive change to the protocol (switching
+    to websockets), and the new code is not currently able to talk to
+    the old server.  I can easily migrate data to the new server, but
+    I thought it might be time for a fresh start; let me know if you
+    want some/all of the data copied over.
+
+OTHER INCOMPATIBILITIES / KNOWN BUGS:
+
+1. The http interface is not currently available.  That means you
+   can't use curl for debugging.  But see 'podsocket' below.
+
+2. onLogout is never called any more.  If the user logs out, they'll
+   have to reload the page to get the app working again.  If you have
+   a use for onLogout, let me know.  I'm leaning towards just having
+   the library force a page reload when the user switches pods, since
+   I don't think most apps will handle the switch gracefully.
+
+3. You can no longer pass arguments to pod.query().  Do all the config
+   like pod.query().filter(...).  instead, please.
+
+4. The behavior of code run before onLogin() is unpredictably different.
+   To avoid this problem, it's best to structure your app like:
+
+     var pod = crosscloud.connect()
+     pod.onLogin(function (userId) {
+        ... your application goes here ...
+     });
+
+5. In the old servers, race conditions would cause data corruption; in
+   the new one they'll probably cause a deadlock.  So this server is
+   somewhat more likely to hang/crash.
+
+6. the error reporting is really bad.  If the server cannot be
+   reached, etc, things tend to silently fail.
+
+NEW FEATURES
+
+0. Websockets seem to be fast and reliable.  Hopefully things will be
+   better-behaved.  While you can probably only get 10 round-trips to
+   the server per second, when you can do operations without knowing
+   the result of the previous one, you can expect thousands of
+   operations per second.
+
+1. The crosscloud.js library now works in Node.JS.  There are some
+   examples in example/node.  It is not yet available under npm but
+   should be soon.
+
+2. Every page now has a server-maintained _lastModified field.  The
+   value is in RFC 3339 format (aka ISO 8601) with fractions of a
+   second.  JavaScript's "new Date (...)" can handle this format.
+
+3. query().limit() is now implemented.  You can say
+ 
+       pod.query()
+          .filter(myFilter)
+          .limit(10)
+		  .onAllResults(displayResults)
+          .start()
+
+   and the array passed to displayResults will have at most 10
+   results.  This features isn't very useful, though, since there's no
+   way to specify the sort order, yet.  For now it's sorted
+   alphabetically by the _id field.
+
+4. Query Events -- these are highly experimental/unstable
+
+   General events have been added to query processing.  .onAllResults(...)
+   can now be written as .on("AllResults", ...)
+
+   The events 'Progress', 'Appear', and 'Disappear' are now defined
+   and will be sent from the server if a handler is set for them in
+   the application.  'Appear' reports that a new result has been
+   found.  Disappear reports that a page previously passed via Appear
+   is no longer a result to this query (perhaps it was deleted,
+   changed to not match the query, or was displaced by new ones which
+   sort earlier under the limit()).  Progress includes a percentage
+   complete.  In particular, 100 means that all changes in known data
+   have been reported and there wont be more appear/disappear events
+   until the data changes on the server.
+ 
+       pod.query()
+          .filter(myFilter)
+		  .on('Appear', function (p) { console.log("matched:",p) })
+		  .on('Disappear', function (p) { console.log("now gone:",p) })
+          .start()
+
+   The parameter passed to the Disappear handler is currently like {
+   _id: "http...." }.  More fields might be added later.
+
+   If you include limit(N), you'll be notified of pages
+   appearing/disappearing from that set of the first-N pages.
+
+   Appear/Disappear are much more efficient than AllResults if there
+   is a large number (>>10) of results, since they don't have to all
+   be re-transmitted when there's a change.
+
+5. There's a small utility, podsocket, in example/node/podsocket that
+   works kind of like curl for talking to the server.  Using it does
+   require familiarity with the actualy socket protocol, though:
+
+   For example:
+ 
+   $ echo '{ "pod": "http://localhost:8080/pod/sandro" }' > ~/.podlogin.json
+   $ podsocket create '{"initialData":{"sandroTest":1}}'
+   RESULT:  {
+     "_etag": "1",
+     "_id": "http://localhost:8080/pod/sandro/a0"
+   }
+   $ podsocket read '{"_id": "http://localhost:8080/pod/sandro/a0"}'
+   RESULT:  {
+       "_etag": "1",
+       "_id": "http://localhost:8080/pod/sandro/a0",
+       "_lastModified": "2014-12-01T01:23:58.074020223Z",
+       "_owner": "http://localhost:8080/pod/sandro",
+       "sandroTest": 1
+   }
+   $ podsocket read '{"_id": "http://localhost:8080/pod/sandro/a999"}'
+   ERROR:  { text: 'page not found' }
+   $ podsocket startQuery '{"filter":{"sandroTest":1}}'
+   EVENT:  QueryCreated { _etag: '1',
+     _id: 'http://localhost:8080/pod/sandro/a1',
+     _lastModified: '2014-12-01T01:24:59.387323336Z',
+     _owner: 'http://localhost:8080/pod/sandro',
+     isQuery: true }
+   EVENT:  Progress { percentComplete: 0, results: 1 }
+   EVENT:  Appear { _etag: '1',
+     _id: 'http://localhost:8080/pod/sandro/a0',
+     _lastModified: '2014-12-01T01:23:58.074020223Z',
+     _owner: 'http://localhost:8080/pod/sandro',
+     sandroTest: 1 }
+   EVENT:  Progress { percentComplete: 100 }
+   EVENT:  AllResults { fullCount: 1,
+     results: 
+      [ { _etag: '1',
+          _id: 'http://localhost:8080/pod/sandro/a0',
+          _lastModified: '2014-12-01T01:23:58.074020223Z',
+          _owner: 'http://localhost:8080/pod/sandro',
+          sandroTest: 1 } ] }
+   
+   ... ( command keeps running, waiting for changes in the database )
+ 
+ 
+ 
+ 

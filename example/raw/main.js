@@ -124,7 +124,9 @@ if (typeof document !== "undefined") $(function(){
 					if (d.value % 250 === 0) console.log('read', d.value);
 					d.value++;
 					if (d.value < 10100) {
-						push(d).then(i2);
+						// push(d).then(i2);    either way?
+						push(d);
+						i2();
 					} else {
 						n4();
 					}

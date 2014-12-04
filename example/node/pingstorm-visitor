@@ -1,0 +1,41 @@
+#!/usr/bin/env node
+
+var crosscloud = require('crosscloud')
+
+crosscloud.connect().then(function (pod) {
+
+	var name = process.argv[2] || process.pid;
+	var session = process.argv[3] || "global";
+
+	var pageCheck = function (page) {
+		pod.pull(page)
+			.then(function () {
+				// console.log(name, page);
+				//console.log(name, page._id, page.firstVisitor, page.lastVisitor);
+			});
+	};
+
+	pod.query()
+		.filter({pingStormSession:session})
+	    // .limit(3)
+		.on('Appear', function (page) {
+			if (!page.firstVisitor) {
+				page.firstVisitor = name;
+				pod.push(page);  // using etag, might fail
+			}
+			// blind push to set the lastVisitor property
+			pod.push({_id:page._id, lastVisitor:name});
+			console.log(name, page._id, page.firstVisitor, page.lastVisitor);
+			setTimeout(function () {pageCheck(page)}, 1000);
+		})
+		.start();
+})
+	.catch(function (err) {
+		console.log(err.target.url+": "+err)
+		process.exit(1);
+	});
+
+
+
+
+

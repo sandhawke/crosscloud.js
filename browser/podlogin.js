@@ -26,13 +26,13 @@
 
 	exports.version = '!!VERSION!!';
 
-	var userID;
+	var userId;
 	var onLoginCallbacks = [];
 	var onLogoutCallbacks = [];
 	var suggestedProviders = [];
 
-	exports.getUserID = function () {
-		if (userID) return userID;
+	exports.getUserId = function () {
+		if (userId) return userId;
 	};
 
 	exports.requireLogin = function () {
@@ -46,8 +46,8 @@
 
 	exports.onLogin = function (callback) {
 		onLoginCallbacks.push(callback);
-		if (userID) {
-			callback(userID);
+		if (userId) {
+			callback(userId);
 		}
 	};
 
@@ -61,23 +61,23 @@
 
 	exports.onLogout = function (callback) {
 		onLogoutCallbacks.push(callback);
-		if (!userID) {
+		if (!userId) {
 			callback();
 		}
 	};
 
 	var gotLogin = function (id) {
-		if (userID) {
+		if (userId) {
 			gotLogout();
 		}
-		userID = id;
+		userId = id;
 		onLoginCallbacks.forEach(function(cb) {
-			cb(userID);
+			cb(userId);
 		});
 	};
 
 	var gotLogout = function () {
-		userID = undefined;
+		userId = undefined;
 		onLogoutCallbacks.forEach(function(cb) {
 			cb();
 		});
@@ -192,7 +192,7 @@
 			
 			if (event.origin !== safeOrigin) return;
 			
-			console.log("app<< ", event.data);
+			//console.log("app<< ", event.data);
 			
 			if (event.data.op === "controlIFrame") {
 				iframeSetProperties(event.data.properties);

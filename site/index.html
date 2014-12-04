@@ -1,11 +1,11 @@
 <!DOCTYPE html>
 <html lang="en-US">
 <head>
-<title>crosscloud.js readme</title>
+<title>crosscloud.js</title>
 <link href="style.css" rel="stylesheet" type="text/css" />
 </head>
 <body>
-<h1>crosscloud.js  (version 0.1.2)</h1>
+<h1>crosscloud.js  (version !!VERSION!!)</h1>
 
 <p>This library makes it easy for browser apps to persist state,
 sharing with other instances of themselves and with compatible apps.
@@ -43,29 +43,30 @@ written by all applications (and other people) authorized by the user.
 
 <p>Basic usage:</p>
 
-<pre>&lt;script src="http://crosscloud.org/0.1.2/crosscloud.js">&lt;/script>
+<pre>&lt;script src="http://crosscloud.org/!!VERSION!!/crosscloud.js">&lt;/script>
 &lt;script src="https://code.jquery.com/jquery-2.1.1.min.js">&lt;/script>
 &lt;script>
 
-$(function(){
-
-  var pod = crosscloud.connect();
+var pod = crosscloud.connect();
+pod.onLogin(function (userId) {
 
   pod.push({ ... some data item you want to add or update ...})
   // if it has no _id, then the item is created, and an _id will be added
   // if it has an _id, then the item will be updated
 
+  var displayResults = function (results) {
+     // 1. results will be a list of pages matching a query filter
+     // 2. this function will be called every time the results change
+  }
+
   pod.query()
-     .onAllResults(function (items) { ... called with matching items ... })
-	 .pattern({ someProperty: "its required value",
-                anotherProperty: "its value",
-			    andAnother: { "$exists": true }  })
+     .filter({ someProperty: "its required value",
+               anotherProperty: "its value",
+               andAnother: { "$exists": true }  })
+     .onAllResults(displayResults)
      .start();
 
-  pod.onLogin(function (userPodID) { ... } )
-  pod.onLogout()
-
-}
+});
 &lt;/script>
 
 </pre>

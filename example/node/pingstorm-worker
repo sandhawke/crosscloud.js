@@ -1,0 +1,47 @@
+#!/usr/bin/env node
+
+var crosscloud = require('crosscloud')
+
+crosscloud.connect().then(function (pod) {
+
+	var name = process.argv[2] || process.pid;
+	var session = process.argv[3] || "global";
+
+	var pages = 100;
+
+	for (var i=0; i<pages; i++) {
+		var g = function (i) {
+
+			var count = 10;
+
+			var page = {pingStormSession:session, creator:name};
+			
+			var f = function () {
+				if (count === 0) {
+					console.log(name, "done");
+					process.exit();
+				}
+				page.count = count;
+				console.log(name, i, "pushing count =", count);
+				count --;
+				delete page._etag;   // or should we track these, and retry?
+				pod.push(page)
+					.then(f);
+			}
+			
+			f();
+		};
+		g(i);
+	}
+})
+	.catch(function (err) {
+		console.log(err.target.url+": "+err)
+		process.exit(1);
+	});
+
+
+
+
+
+
+

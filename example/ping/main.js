@@ -63,13 +63,20 @@ if (typeof document !== "undefined") $(function(){
 
 	var allResults = function (results) {
 		console.log('results', results);
-		if (results.length > 1 || results[0]._id != packet._id || results[0].count != count) {
-			console.log('BAD', packet, results, count);
-			//alert('bad ping result');
+		if (results.length !== 1) {
+			console.log('wrong number of results', packet, results, count, results.length);
 			return;
-		} else {
-			console.log('GOOD', packet, results, count);
-		}
+		} 
+		if (results[0]._id != packet._id) {
+			console.log('wrong id', packet, results, count);
+			return;
+		}	
+		if (results[0].count != count) {
+			console.log('wrong count', packet, results, count);
+			return;
+		}	
+		console.log('GOOD', packet, results, count);
+
 		var r = results[0];
 		// assert r.sent === thisPing.start.toISOString()
 		var qd = (new Date()) - start;
