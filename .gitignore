@@ -1,8 +1,7 @@
 .versioned/
 *~
 OLD/*
-node_modules/ws
-node_modules/promise
+node_modules/
 doctest/*
 
 

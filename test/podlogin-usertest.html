@@ -46,15 +46,15 @@ wait(function () { return true }, 100);
 <h2>Force Logout</h2>
 
 <pre class="test">
-if (podlogin.getUserID()) {
+if (podlogin.getUserId()) {
 
   // just for use in tests
   podlogin.forceLogout();
-  wait(function () { return podlogin.getUserID() === undefined }, 20000);
+  wait(function () { return podlogin.getUserId() === undefined }, 20000);
 }
 // => ...
 
-print(podlogin.getUserID());
+print(podlogin.getUserId());
 // => undefined
 
 </pre>
@@ -72,7 +72,7 @@ document.getElementById("login-1").addEventListener("click", function(){
    podlogin.requireLogin();
 });
 
-wait(function () { return podlogin.getUserID() }, 60000);
+wait(function () { return podlogin.getUserId() }, 60000);
 // => User logged in: http://test.databox1.com
 </pre>
 

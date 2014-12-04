@@ -19,26 +19,26 @@
 <p>This does NOT actually test the iframe and dialog boxes, so it can
 run without any user help.</p>
 
-<h2>getUserID</h2>
+<h2>getUserId</h2>
 
-<p>Find out current UserID (if any)</p>
+<p>Find out current UserId (if any)</p>
 
 <pre class="test">
 // Just in case the user running this test is actually logged in
 podlogin.simulateLogout()
 
-print(podlogin.getUserID());
+print(podlogin.getUserId());
 // => undefined
 
 // this is just for testing/demo
 podlogin.simulateLogin("http://alice.example");
 
 // but then you can see it like this:
-print(podlogin.getUserID());
+print(podlogin.getUserId());
 // => http://alice.example
 
 podlogin.simulateLogout();
-print(podlogin.getUserID());
+print(podlogin.getUserId());
 // => undefined
 
 </pre>
