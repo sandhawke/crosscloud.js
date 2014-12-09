@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-var crosscloud = require('crosscloud')
+var crosscloud = require('../..')
 
 crosscloud.connect().then(function (pod) {
 		

@@ -25,14 +25,14 @@ describe('connect', function() {
 			q.stop();  //   q.once, or something, would be nice.
 			var remaining = results.length;
 			if (remaining == 0) { 
-				// console.log('no results, nothing to delete');
+				//console.log('no results, nothing to delete');
 				done(); 
 			}
 			results.forEach(function (page) {
 				//console.log('calling delete', page);
 				pod.delete(page)
 					.then(function() { 
-						// console.log('deleted', page);
+						//console.log('deleted', page);
 						remaining--;
 						if (remaining == 0) { done();}
 					});
@@ -49,6 +49,12 @@ describe('simple push-to-create', function() {
 	
 	it('should call its callback', function(done) {
 		pod.push(page, function() {
+			done()
+		});
+	});
+
+	it('should fulfill its promise', function(done) {
+		pod.push(page).then(function() {
 			done()
 		});
 	});
@@ -114,7 +120,7 @@ describe('incremental query', function() {
 	var item2 = {testCode:2, match:false, payload:2};
 	it('should get nothing when we push a non-match', function(done) {
 		eventHandler = fail;
-		pod.push(item2, done);
+		pod.push(item2, function () { done(); });
 		// hard to know when this test is done, but if get the extra
 		// event later, the next test will fail.
 	});

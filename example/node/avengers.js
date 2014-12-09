@@ -37,6 +37,21 @@ var person = {
 		name: "Odin",
 		// imageURL: "http://upload.wikimedia.org/wikipedia/commons/f/f8/Odin,_der_G%C3%B6ttervater.jpg"
 		imageURL: "http://upload.wikimedia.org/wikipedia/commons/9/9f/Odin_%28Manual_of_Mythology%29.jpg"
+	},
+	loki:
+	{
+		name: "Loki",
+		imageURL: "http://fc04.deviantart.net/fs70/i/2012/114/0/1/happy_loki_by_vadeg-d4xhx5d.jpg"
+	},
+	widow:
+	{
+		name: "Natasha Romanoff",
+		imageURL: "http://fc05.deviantart.net/fs70/f/2012/258/5/d/natasha_romanoff_by_scarlet_xx-d5eu9p5.jpg"
+	},
+	cap:
+	{
+		name: "Captain America",
+		imageURL: "http://fc07.deviantart.net/fs15/f/2007/046/c/7/Chibi_Captain_America_4__by_hedbonstudios.jpg"
 	}
 };
 
@@ -45,15 +60,18 @@ var contacts = [
 	{from:person.nick, to:person.maria},
 	{from:person.nick, to:person.thor},
 	{from:person.nick, to:person.stark},
-	{from:person.thor, to:person.odin}
+	{from:person.nick, to:person.widow},
+	{from:person.thor, to:person.odin},
+	{from:person.thor, to:person.loki},
+	{from:person.cap, to:person.widow},
 ];
 
 var connection = {};
 
-base = "http://localhost:8080/pod/avengers_";
 base = "http://localhost:8080/pod/";
 for (var key in person) {
-	person[key]._id = base+key+"/";
+	// person[key]._id = base+key+"/";
+	person[key]._id = "http://"+key+".databox1.com/";
 }
 
 var promises = [];
@@ -73,6 +91,14 @@ for (var i in contacts) {
 	pod = connection[contact.from._id];
 	var contact = {isContact:true,
 				   siteURL:contact.to._id}
+	pod.push(contact, 
+			 function(c) {console.log('pushed connection', c);});
+};
+for (var i in contacts) {
+	var contact = contacts[i];
+	pod = connection[contact.to._id];
+	var contact = {isContact:true,
+				   siteURL:contact.from._id}
 	pod.push(contact, 
 			 function(c) {console.log('pushed connection', c);});
 };

@@ -44,7 +44,7 @@ td, th {
 	  <p>Not logged in.   Use the pod login control (upper right).</p>
 	</div>
 
-	<div id="profile" style="display: none">
+	<div id="profile" style="display: block">
 
 	  <p>Name: <span id="name-note"></span><br/>
 	  <input id="name" type="text" placeholder="your name (optional)" size="30" />
@@ -53,6 +53,25 @@ td, th {
 	  <p>Self-Description: <span id="selfDescription-note"></span><br/>
 	  <input id="selfDescription" placeholder="A brief statement of who you are (optional)" size="60" />
 	</p>
+
+
+	<p>Profile picture: <br/>
+	<img id="pic" src="data:image/png;base64:" height="150" alt="picture of you" /> 
+	<br/>
+	<button id="b1" type="button">Set new image URL</button>
+	<button id="b2" type="button">Upload/Capture new image</button>
+	<br/>
+	</p>
+
+	<p id="newURL" style="display: none">
+	  Image URL: <span id="imageURL-note"></span><br/>
+	<input id="imageURL" placeholder="http://...  URL of picture of you" size="60" />
+	</p>
+
+	<p id="newUpload" style="display: none">Select image: 
+	<input type="file" id="upload" name="files" />
+	</p>
+
 
 	</div>
 

@@ -154,7 +154,7 @@ var init = function () {
 			becomeIcon();
 		});
 
-		podurlElement = document.getElementById('podurl_v020');
+		podurlElement = document.getElementById('podurl_v013');
 		podurlElement.addEventListener("keypress", function(e) {
 			var key = e.which || e.keyCode;
 			if (key == 13) {
@@ -176,7 +176,7 @@ var init = function () {
 		document.getElementById('podurlprompt').style.display="block";
 		document.getElementById('selectedpod').style.display="none";
 		podURL = null;
-		localStorage.removeItem('selectedPodURL');
+		localStorage.removeItem('selectedPodURL_v013');
 		sendToApp({op:"logout"});
 		document.getElementById('podprogress')
 			.innerHTML = "Please Select a Pod";
@@ -184,6 +184,7 @@ var init = function () {
 
 	var urlEntered = function () {
 		var podurl = podurlElement.value;
+		console.log('urlEntered', podurl);
 		if (podurl === "") return;
 		if (podurl === podURL) return;  // this isn't a change!
 		
@@ -191,6 +192,15 @@ var init = function () {
 			// actually this hostname seems to misbehave in chrome
 			alert("don't use 'demo.fakepods.com' please");
 		}
+
+		if (podurl[podurl.length - 1] != "/") {
+			podurl = podurl+"/";
+		}
+		if (podurl.substr(0, 7) != "http://") {
+			podurl = "http://"+podurl;
+		}
+		podurlElement.value = podurl;
+
 		podURL = podurl; // probably don't want this, but don't want TWO EVETNS with blur...
 
 
@@ -201,6 +211,7 @@ var init = function () {
 		// send, but that's going to need a popup, I think.
 
 		// var win = window.open(podurl, "_blank", "resizable,scrollbars,status,location");
+
 
 		useURL(podurl);
 
@@ -218,7 +229,7 @@ var init = function () {
 
 		document.getElementById('selectedpod').style.display="block";
 
-		localStorage.setItem('selectedPodURL', podurl);
+		localStorage.setItem('selectedPodURL_v013', podurl);
 		sendToApp({op:"login", data:{podID:podurl}});
 	};
 
@@ -231,7 +242,7 @@ var init = function () {
 		listenToApp();
 		sendToApp({op:"awake"});
 
-		var u = localStorage.getItem('selectedPodURL');
+		var u = localStorage.getItem('selectedPodURL_v013');
 		if (u) {
 			podURL = u;
 			podurlElement.value = u;

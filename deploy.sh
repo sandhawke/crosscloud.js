@@ -6,7 +6,7 @@ if [ ! -f browser/podlogin.js -a -f deploy.sh ] ; then
 fi
 
 VERSION=0.1.3-alpha-`id -un`
-# VERSION=0.1.3-beta3
+#VERSION=0.1.3-beta4
 echo VERSION=$VERSION
 
 
@@ -34,7 +34,9 @@ done
 echo "copying to servers..."
 # include https://es6-promises.s3.amazonaws.com/es6-promise-2.0.0.min.js" ?
 echo "// combined js files, for version $VERSION" > crosscloud.js
-cat browser/podlogin.js lib/webcircuit.js lib/main.js >> crosscloud.js
-rsync -aR RELEASE.txt crosscloud.js browser/podlogin.js site/index.html site/style.css example site/doctest test root@www1.crosscloud.org:/sites/crosscloud.org/$VERSION/
+cat browser/podlogin.js lib/webcircuit.js lib/displayInApp.js lib/main.js >> crosscloud.js
+rsync -aR RELEASE.txt crosscloud.js browser/podlogin.js example test root@www1.crosscloud.org:/sites/crosscloud.org/$VERSION/
 rsync browser/podlogin-iframe.html browser/podlogin-iframe.js root@podlogin.org:/sites/podlogin.org/$VERSION/
+cd site
+rsync -aR index.html style.css doctest root@www1.crosscloud.org:/sites/crosscloud.org/$VERSION/
 echo done

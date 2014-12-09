@@ -5,24 +5,71 @@ if (typeof document !== "undefined") $(function(){
 	
     $("#error").html("");  // clear the "Missing Javascript" error message
 
-	var properties = ["name", "selfDescription"]
+	var properties = ["name", "selfDescription", "imageURL"]
 	
     var pod = crosscloud.connect();
 	pod.requireLogin();
 	
 	var profile = {};
 
-	pod.onLogin(function (userID) {
-		$('#notLoggedIn').hide();
-		profile._id = userID;
-		pod.pull(profile)
-			.then(function () {
-				properties.forEach( function (p) {
-					$("#"+p).val(profileObj[p]);
-					note(p).innerHTML = "";
-				});
-			})
-	});
+	var save = function (prop, newValue) {
+		if (profile._id) {
+			delete profile._etag;
+			note(prop).innerHTML = "saving..."
+			if (newValue === undefined) {
+				newValue  = $("#"+prop).val();
+			}
+			profile[prop] = newValue;
+			console.log("pushing", profile);
+			pod.push(profile, function(){
+				console.log("push returned");
+				note(prop).innerHTML = "saved";
+				var propCopy = prop;
+				setTimeout(function () {
+					note(propCopy).innerHTML = "";
+				}, 500);
+
+				/*
+				  should be automatic...
+
+				  if (prop == imageURL) {
+				  document.getElementById('pic').src = profile.imageURL;
+				  }
+				*/
+				if (prop == "imageURL") {
+					$("#newUpload").hide();
+					$("#newURL").hide();
+				}
+			});
+		}
+	};
+
+	var display = function (allResults) {
+		// console.log('display', allResults);
+		if (allResults.length < 0 || allResults.length > 1) {
+			console.log("? wrong number of results");
+			return;
+		}
+		profile = allResults[0];
+		var result = allResults[0];
+		properties.forEach( function (p) {
+			note(p).innerHTML = "";
+			if (profile[p]) {
+				if (profile[p].length < 256) {
+					$("#"+p).val(profile[p]);
+				} else {
+					note(p).innerHTML = "too long: "+profile[p].length+" chars"
+				}
+			} else {
+				note(p).innerHTML = "No value set";
+			}
+		});
+		if (profile.imageURL) {
+			document.getElementById('pic').src = profile.imageURL;
+		}
+	}
+
+	var q; 
 
 	var note = function(p) {
 		return document.getElementById(p+"-note");
@@ -33,16 +80,85 @@ if (typeof document !== "undefined") $(function(){
 	});
 
 	properties.forEach( function (p) {
-		$("#"+p).blur(function (e) {
-			if (profileObj) {
-				note(p).innerHTML = "saving..."
-				profileObj[p] = $("#"+p).val();
-				pod.push(profileObj, function(){
-					note(p).innerHTML = "saved";
-					// remove this after 500ms?
-				});
+		$("#"+p).blur(function (e) { save(p) });
+		$("#"+p).keypress(function (e) {
+			if (e.which == 13) {
+				e.target.blur();
+				save(p);
 			}
 		});
+	});
+
+	$("#b1").click(function (e) { 
+		$("#newURL").show();
+	});
+
+	$("#b2").click(function (e) {
+		$("#newUpload").show();
+
+
+		// given a file object, return a thenable with the dataURL
+		var readFileToDataURL = function (file) {
+			var reader = new FileReader();
+			var my = { };
+			reader.onload = function(e) {
+				my.thenCallback(e.target.result);
+			};
+			
+			reader.readAsDataURL(file);
+			return {
+				then: function (thenCallback) {
+					my.thenCallback = thenCallback;
+				}
+			}
+		}
+
+		var input = document.getElementById("upload");
+
+		input.onchange = function (event) {
+			event.preventDefault();
+			var file = input.files[0];
+
+			readFileToDataURL(file)
+				.then(function(dataURL) {
+					save("imageURL", dataURL);
+				})
+		};
+				  
+
+	});
+
+	var focusMode = false;
+
+	crosscloud.onFocusPage(function foo(page) {
+		focusMode = true;
+		console.log('profile: in focus mode!', page._id);
+		$('#notLoggedIn').hide();
+		$('#profile').show();
+		profile = page;
+		display([page]);
+	});
+
+	pod.onLogin(function (userId) {
+		$('#notLoggedIn').hide();
+		$('#profile').show();
+
+		// onFocusPage is guaranteed to never be called after onLogin
+		if (!focusMode) {
+			profile._id = userId;
+			
+			q = pod.query()
+				.filter({ _id: userId })
+				.onAllResults(display)
+				.start();
+		}
+	});
+
+	pod.onLogout(function () {
+		if (q) { q.stop(); };
+		q = null;
+		$('#notLoggedIn').show();
+		$('#profile').hide();
 	});
 
 });
