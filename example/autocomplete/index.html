@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en-US">
+<head>
+<title>Autocomplete Demo</title>
+<script src="http://crosscloud.org/!!VERSION!!/crosscloud.js"></script>
+<script src="http://crosscloud.org/!!VERSION!!/socialgraph.js"></script>
+<script src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
+<script src="typeahead.jquery.js"></script>
+<script src="main.js"></script>
+<style>
+body { 
+  font-family: Arial; 
+}
+.note {
+  margin: 0;
+  padding-left: 2em;
+  font-size: 85%;
+  font-style: italic;
+}
+table {
+    border-width: 5px;
+}
+thead td {
+  background: #ccc;
+}
+tbody tr th {
+  border-bottom: 1px solid #ccc;
+}
+tbody tr:hover {
+ background: #eee;
+}
+td, th {
+ padding: 2px;
+ padding-left: 6px
+}
+
+</style>
+<base href="" target="_parent" />
+</head>
+<body>
+  <div id="error">JS Not Running</div>
+  <div>
+
+	<h2>Autocomplete: Selecting a Person<br/><span style="font-size: 70%; color:gray;">Crosscloud Demo Application</span></h2>
+
+	<p class="note">This runs entirely in the client.   The server knows nothing of the social graph, and (currently) does not do recursive queries, so the client has to walk the social graph to gather the data for this.
+	</p>
+
+	<p style="margin-top: 2em" class="note"><span id="count">0</span> people included from
+	the social graph around <span id="center">(TBD)</span>, going out
+	<span id="hops">0</span> hops.</p>
+
+	
+	<div style="height: 200px; width: 200px; float:right; background: #CCCCCC;" id="out">
+	</div>
+
+	<p></p>
+	<hr />
+	<p></p>
+
+	<p>Enter name<br/><input id="name" class="typeahead" type="text" placeholder="start typing here"></input></p>
+
+	</div>
+  </div>
+</body>

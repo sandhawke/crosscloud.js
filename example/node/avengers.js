@@ -70,14 +70,14 @@ var connection = {};
 
 base = "http://localhost:8080/pod/";
 for (var key in person) {
-	// person[key]._id = base+key+"/";
-	person[key]._id = "http://"+key+".databox1.com/";
+	person[key]._id = base+key+"/";
+	// person[key]._id = "http://"+key+".databox1.com/";
 }
 
 var promises = [];
 for (var key in person) {
 	var profile = person[key];
-	# set .openWith ??
+	// set .openWith ??
 	var pod = crosscloud.connect({podURL:profile._id});
 	connection[profile._id] = pod;
 	pod.push(profile, function (p) {
@@ -103,3 +103,5 @@ for (var i in contacts) {
 	pod.push(contact, 
 			 function(c) {console.log('pushed connection', c);});
 };
+
+setTimeout(function () {process.exit(0);}, 500);
