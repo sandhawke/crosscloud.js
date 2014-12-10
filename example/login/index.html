@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en-US">
+<head>
+<title>Login Demo</title>
+<script src="http://crosscloud.org/!!VERSION!!/crosscloud.js"></script>
+<script type="application/javascript">
+console.log("cc", crosscloud);
+</script>
+<script src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
+<script src="main.js"></script>
+<style>
+body { 
+  font-family: Arial; 
+}
+.note {
+  margin: 0;
+  padding-left: 2em;
+  font-size: 85%;
+  font-style: italic;
+}
+table {
+    border-width: 5px;
+}
+thead td {
+  background: #ccc;
+}
+tbody tr th {
+  border-bottom: 1px solid #ccc;
+}
+tbody tr:hover {
+ background: #eee;
+}
+td, th {
+ padding: 2px;
+ padding-left: 6px
+}
+
+</style>
+</head>
+<body>
+  <div id="error">JS Not Running</div>
+  <div>
+
+	<h2>Login/Logout<br/><span style="font-size: 70%; color:gray;">Crosscloud Demo Application</span></h2>
+
+	<button type="button" id="login">Login</button>
+	<button type="button" id="logout">Logout</button>
+	
+	<p id="tryframe">Also try running <a href="test.html">in a frame</a>.</p>
+	
+	<p>Events:</p>
+	<pre id="log"></pre>
+  </div>
+</body>
+</html>

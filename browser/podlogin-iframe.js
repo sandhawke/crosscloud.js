@@ -7,7 +7,7 @@
 */
 
 /*jslint browser:true*/
-/*jslint devel:false*/
+/*jslint devel:true*/
 
 var init = function () {
 	"use strict";
@@ -44,6 +44,13 @@ var init = function () {
 					//console.log('already logged in to '+podURL);
 				} else {
 					//console.log('prompting for login');
+
+					var msg = message.messageForUser;
+					var out = document.getElementById('msg');
+					while (out.firstChild) { out.removeChild(out.firstChild); }
+					if (msg) {
+						out.appendChild(document.createTextNode(msg));
+					}
 					becomePanel();
 				}
 

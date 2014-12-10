@@ -19,13 +19,14 @@
 */
 
 /*jslint browser:true*/
-/*jslint devel:false*/
+/*jslint devel:true*/
 
 (function(exports){
     "use strict";
 
     exports.version = '!!VERSION!!';
 
+    var runOptions = {};
     var userId;
     var onLoginCallbacks = [];
     var onLogoutCallbacks = [];
@@ -35,8 +36,8 @@
         return userId;
     };
 
-    exports.requireLogin = function () {
-        send({op:'requireLogin'});
+    exports.requireLogin = function (msg) {
+        send({op:'requireLogin', messageForUser:msg});
         // (disable this window until we get it?)
     };
 
@@ -45,6 +46,7 @@
     };
 
     exports.onLogin = function (callback) {
+        //console.log('pushing', callback);
         onLoginCallbacks.push(callback);
         if (userId) {
             callback(userId);
@@ -61,26 +63,55 @@
 
     exports.onLogout = function (callback) {
         onLogoutCallbacks.push(callback);
-        if (!userId) {
-            callback();
-        }
+
+        // There's an asymetry with onLogin, which would call the
+        // callback if you were already logged in, because when things
+        // start up we're logged out.  We don't want onLogout handlers
+        // to all run at startup time.  
     };
 
     var gotLogin = function (id) {
+        //if (id === userId) {
+        //  return;
+        //}
         if (userId) {
             gotLogout();
         }
         userId = id;
         onLoginCallbacks.forEach(function(cb) {
-            cb(userId);
+            // still process the others...?
+            try {
+                cb(userId);
+            } catch(err) {
+                console.log("exception in login handler:", err);
+            }
         });
     };
 
+    // If the callback really handled the logout by clearing all user
+    // data from the screen and memory, then return true.  If no
+    // callback does that, we force a window reload to make sure the
+    // data is cleared.
     var gotLogout = function () {
+        //console.log("gotLogout");
+        if (userId === undefined) return;
         userId = undefined;
+        var someoneHandledIt = false;
         onLogoutCallbacks.forEach(function(cb) {
-            cb();
+            var result = false;
+            try {
+                result = cb();
+            } catch(err) {
+                console.log("exception in logout handler:", err);
+            }
+            if (result) {
+                someoneHandledIt = true;
+            }
         });
+        if ( ! someoneHandledIt ) {
+            alert('should reload');
+            // location.reload();
+        }
     };
 
     /////
@@ -114,18 +145,28 @@
 
     var beginChildMode = function () {
         
-        // a much simpler world, when we're running in an iframe
-        // and the parent handles the user interaction
+        /*
+          In this case, this app is running in an iframe, so
+          we just want to use the parent's podlogin.  We'll
+          get login/logout events from our parent (instead
+          of our child iframe).
+
+          Of course the parent might be lying about what pod the user
+          asked for.   But that shouldn't matter, ... I think.
+
+          Also, we might get 'focus', which means the parent is
+          sending us a copy of the focusPage data.  But we don't
+          really need to use that, since we can get it via our normal
+          pod connection.
+        */
+
+        childMode = true;  
 
         window.addEventListener("message", function(event) {
-                    
-            // if (event.origin !== safeOrigin) return;
+             
+            if (event.source !== parent) return;
                 
            //console.log("child<< ", event.origin, event.data);
-
-            // Parent MUST sent focus BEFORE login, since
-            // apps expect podlogin.focusPage to be set
-            // when they get the login event.
 
             if (event.data.op === "login") {
                 gotLogin(event.data.data.podID);
@@ -172,12 +213,17 @@
     var iframediv;
     var iframeIsAwake = false;
     var buffer = [];
+    var childMode = false;
 
     var send = function (msg) {
-        if (iframeIsAwake) {
-            iframe.contentWindow.postMessage(msg, safeOrigin);
+        if (childMode) {
+            parent.postMessage(msg, "*");
         } else {
-            buffer.push(msg);
+            if (iframeIsAwake) {
+                iframe.contentWindow.postMessage(msg, safeOrigin);
+            } else {
+                buffer.push(msg);
+            }
         }
     };
 
@@ -279,7 +325,29 @@
         });
     };
 
-    if (location.hash === "#podlogin-use-parent") {
+    if (location.hash.length > 2) {
+        var hash = decodeURIComponent(location.hash);
+        //console.log("hash:", hash);
+        try { 
+            runOptions = JSON.parse(hash.slice(1));
+            //console.log("podlogin got options: ", runOptions);
+        } catch (e) { 
+            console.log("Error in parsing location.hash as JSON", e) ;
+        }
+    }
+
+    // This probably renders all the other focus stuff here
+    // superfluous.  I mean, it's nice to be passed the data, and
+    // maybe we'll want to use that, but we kind of want a proper
+    // connection via our pod anyway, so we can see updates, etc.
+    exports.focusPageLocation = runOptions.focus;
+
+    //console.log('runOptions:', runOptions);
+
+    if (runOptions.useParentLogin ||
+        // Legacy
+        location.hash === "#podlogin-use-parent") {
+        
         beginChildMode();
     } else {
         // build the iframe as soon as the DOM is ready
@@ -292,6 +360,102 @@
             });
         }
     }
+
+
+    
+    exports.runChildApp = function (app, elem) {
+
+        if (elem === undefined) {
+            elem = document.body;
+        }
+
+        var iframe;
+        var iframeSource = app;
+        
+        // allow there to already be options on the openWith URL?  Maybe?
+        var options = { focus:location.href, useParentLogin:true };
+        iframeSource += "#"+encodeURIComponent(JSON.stringify(options));
+
+        var relayToChild = function(child) {
+
+            var sendToApp = function (m) {
+                child.postMessage(m, "*");
+            };
+
+            exports.onLogin(function (a) {
+                //console.log("runChildApp sending login to child");
+                sendToApp({op:"login", data:{podID:a}});
+            });
+            exports.onLogout(function () {
+                //console.log("runChildApp sending logout to child");
+                sendToApp({op:"logout"});
+                return true;
+            });
+        };
+
+        window.addEventListener("message", function (event) {
+            if (event.source !== iframe.contentWindow) return;
+            if (event.data.op !== "awake") return;
+
+            // we can't start sending stuff, like the current login,
+            // to the child until it's awake.  Otherwise it would
+            // get dropped -- also, contentWindow is null for a while
+            //console.log("runChildApp sees child awake");
+            relayToChild(iframe.contentWindow);
+        });
+
+        window.addEventListener("message", function (event) {
+            if (event.source !== iframe.contentWindow) return;
+            if (event.data.op !== "requireLogin") return;
+            //console.log("runChildApp sees requireLogin");
+            exports.requireLogin(event.data.messageForUser);
+        });
+
+        window.addEventListener("message", function (event) {
+            if (event.source !== iframe.contentWindow) return;
+            if (event.data.op !== "forceLogout") return;
+            //console.log("runChildApp sees forceLogout");
+            exports.forceLogout();
+        });
+
+        while (elem.firstChild) {
+            elem.removeChild(elem.firstChild);
+        }
+        var panel = document.createElement("div");
+        panel.style.position = "absolute";
+        panel.style.left = "0px";
+        panel.style.top = "0px";
+        panel.style.width = "100%";
+        panel.style.height = "100%";
+
+        var upper = document.createElement("div");
+        upper.style.height = "1.5em";
+        upper.style.background = "#B8B8C8";
+        upper.style.padding = "3px";
+        // upper.style.border = "6px solid light-gray";
+        var msg = document.createTextNode("This data page is being displayed by  app="+app);
+        upper.appendChild(msg);
+
+        iframe = document.createElement("iframe");
+        iframe.setAttribute("src", iframeSource);
+        iframe.style.left = "0px";
+        iframe.style.top = "0px";
+        iframe.style.width = "100%";
+        iframe.style.height = "100%";
+        
+        panel.appendChild(upper);
+        panel.appendChild(iframe);
+        elem.appendChild(panel);
+        
+        // really, on click of an x, I think
+        //setTimeout(function () {
+        //  panel.removeChild(upper);
+        //}, 2000);
+    };
+
+
+
+
 
 /*global exports */   // um, this code will never actually run in Node....
 })(typeof exports === 'undefined'? this.podlogin={}: exports);

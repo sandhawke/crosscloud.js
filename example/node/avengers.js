@@ -77,6 +77,7 @@ for (var key in person) {
 var promises = [];
 for (var key in person) {
 	var profile = person[key];
+	# set .openWith ??
 	var pod = crosscloud.connect({podURL:profile._id});
 	connection[profile._id] = pod;
 	pod.push(profile, function (p) {
