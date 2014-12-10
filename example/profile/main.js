@@ -128,37 +128,16 @@ if (typeof document !== "undefined") $(function(){
 
 	});
 
-	var focusMode = false;
-
-	crosscloud.onFocusPage(function foo(page) {
-		focusMode = true;
-		console.log('profile: in focus mode!', page._id);
-		$('#notLoggedIn').hide();
-		$('#profile').show();
-		profile = page;
-		display([page]);
-	});
-
 	pod.onLogin(function (userId) {
 		$('#notLoggedIn').hide();
 		$('#profile').show();
 
-		// onFocusPage is guaranteed to never be called after onLogin
-		if (!focusMode) {
-			profile._id = userId;
-			
-			q = pod.query()
-				.filter({ _id: userId })
-				.onAllResults(display)
-				.start();
-		}
-	});
-
-	pod.onLogout(function () {
-		if (q) { q.stop(); };
-		q = null;
-		$('#notLoggedIn').show();
-		$('#profile').hide();
+		profile._id = userId;
+		
+		q = pod.query()
+			.filter({ _id: userId })
+			.onAllResults(display)
+			.start();
 	});
 
 });
