@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en-US">
+<head>
+<title>Test</title>
+<script src="http://crosscloud.org/!!VERSION!!/crosscloud.js"></script>
+<script src="http://crosscloud.org/!!VERSION!!/socialgraph.js"></script>
+<script src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
+<script src="typeahead.jquery.js"></script>
+<script src="http://cdnjs.cloudflare.com/ajax/libs/handlebars.js/2.0.0/handlebars.min.js"> </script>
+<script src="main.js"></script>
+<style>
+body { 
+  font-family: Arial; 
+}
+.note {
+  margin: 0;
+  padding-left: 2em;
+  font-size: 85%;
+  font-style: italic;
+}
+table {
+    border-width: 5px;
+}
+thead td {
+  background: #ccc;
+}
+tbody tr th {
+  border-bottom: 1px solid #ccc;
+}
+tbody tr:hover {
+ background: #eee;
+}
+td, th {
+ padding: 2px;
+ padding-left: 6px
+}
+
+</style>
+<base href="" target="_parent" />
+</head>
+<body>
+  <div id="error">JS Not Running</div>
+  <div>
+
+	<h2>Input Site<br/><span style="font-size: 70%; color:gray;">Crosscloud Demo Application</span></h2>
+
+	<input id="name" class="typeahead" type="text" placeholder="Someone's name"></input>
+
+	</div>
+  </div>
+</body>
