@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en-US">
+<head>
+<title>Test</title>
+<script src="http://crosscloud.org/!!VERSION!!/crosscloud.js"></script>
+<script src="http://crosscloud.org/!!VERSION!!/socialgraph.js"></script>
+<script src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
+<script src="http://cdnjs.cloudflare.com/ajax/libs/handlebars.js/2.0.0/handlebars.min.js"> </script>
+<script src="main.js"></script>
+<style>
+body { 
+  font-family: Arial; 
+}
+.note {
+  margin: 0;
+  padding-left: 2em;
+  font-size: 85%;
+  font-style: italic;
+}
+table {
+    border-width: 5px;
+}
+thead td {
+  background: #ccc;
+}
+tbody tr th {
+  border-bottom: 1px solid #ccc;
+}
+tbody tr:hover {
+ background: #eee;
+}
+td, th {
+ padding: 2px;
+ padding-left: 6px
+}
+
+</style>
+<base href="" target="_parent" />
+</head>
+<body>
+  <div id="error">JS Not Running</div>
+  <div>
+
+	<img style="float: right" id="pic" src="data:image/png;base64:" height="150" alt="profile picture" /> 	
+
+	<h2>Personal Site<br/><span style="font-size: 70%; color:gray;">Crosscloud Demo Application</span></h2>
+
+
+	<p>Name: <span id="name"></span></p>
+	<p>About: <span id="selfDescription"></span></p>
+
+	<button type="button" id="add">Add As Contact</button>
+	<p>See the <a href="http://www.crosscloud.org/!!VERSION!!/example/contacts">contact manager</a></p>
+
+	<p>Their Contacts:</p>
+
+
+	<script id="contact-template" type="text/x-handlebars-template">
+		<a href="{{_id}}"><img src="{{imageURL}}" height="100" alt="picture of {{name}}"></img>
+	</script>
+
+	<div id="contacts" style="display: none">
+	</div>
+
+	  
+	</div>
+  </div>
+</body>
