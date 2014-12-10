@@ -109,8 +109,8 @@
             }
         });
         if ( ! someoneHandledIt ) {
-            alert('should reload');
-            // location.reload();
+            // alert('should reload');
+            location.reload();
         }
     };
 
