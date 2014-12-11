@@ -20,6 +20,8 @@ for jsfile in browser/podlogin.js browser/podlogin-iframe.js lib/main.js; do
    jshint $jsfile
 done
 
+rsync site/contrib.html root@www1.crosscloud.org:/sites/crosscloud.org/ &
+
 echo "replacing !!VERSION!!..."
 rm -rf .versioned
 mkdir .versioned
