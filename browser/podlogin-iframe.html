@@ -3,28 +3,107 @@
 <head>
 <title></title>
 <script src="podlogin-iframe.js"></script>
+<script src="http://code.jquery.com/jquery-2.1.1.min.js"></script>
+<link href="http://maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css" rel="stylesheet">
+<style>
+  body {
+     margin: 0;
+	 padding: 0;
+     font-family: Cantarell, Arial, clean, sans-serif;
+  }
+  div {
+     margin: 0;
+	 padding: 0;
+  }
+  .status {
+     font-size: 12px;
+     // border: 1px solid red;
+  }
+
+  #icon:hover {
+     backgroundColor = "#3388cc";
+     cursor: pointer;
+  }
+
+  div.close:hover {
+     text-shadow: 2px 2px 2px #ccc;
+     cursor: pointer;
+	 color: blue;
+  }
+
+  div.close {
+    float:right;
+  }
+
+  .pic .fa-user {
+    font-size: 30px;
+  }
+
+  .pic {
+     float:left; 
+	 height: 40px; 
+	 width: 40px; 
+	 text-align: center;
+     color: #444;
+  }
+
+  .missing {
+     color: #CCC;
+  }
+
+
+  h2 {
+     text-align: center;
+  }
+</style>
 </head>
 <body>
 
   <div id="error">Configuration Error</div>
 
-  <div id="icon" style="display:none"></div>
-  
-  <div id="panel">
-	<div style="float:right" id="x">[X]</div>
+  <div id="icon" class="become-status prefer-icon-false" style="display:none"></div>
+
+  <div id="status">  
+	<div id="no" class="status" style="display:block">
+	  <div class="close become-icon prefer-icon"><i class="fa fa-close"></i></div>
+	  <div class="pic"><i class="fa fa-user"></i></div>
+	  <!-- <span style="padding: 2px; margin: 1px; float:left; border:2px solid gray;" class="become-panel">LOGIN</span> -->
+	  <button style="float:left" class="become-panel">LOGIN</button>
+	  <div>Not Logged In (Crosscloud Pod Login Available) <span style="font-size:85%">Data generated during this session is being stored with a browser cookie and may be published (anonymously) or deleted at any time, as with many web sites.  To take control of your data, log in.</span></div>
+	</div>
 	
-	<h2>Crosscloud Pod Control (Early Draft Version)</h2>
+	<div id="yes" class="status" style="display:block">
+	  <div class="close become-icon prefer-icon"><i class="fa fa-close"></i></div>
+	  <div class="pic"><i class="fa fa-user missing"></i></div>
+	  <div>Crosscloud Status: Using pod <span class="userlink"></span></div>
+	  <div>
+		<!--<button disabled="disabled" style="margin:1em">SETTINGS (Not Implemented)</button> -->
+	  <button class="logout" style="float:right; margin:1em;">LOGOUT</button></div>
+	</div>
+  </div>
+
+  <div id="panel">
+	<div class="close become-status" style="font-size: 100%"><i class="fa fa-close fa-1g"></i></div>
+	
+	<h2>Crosscloud Login</h2>
 
 	<div id="podurlprompt">
 
 	  <p>
-	  You need a <i>Crosscloud Pod</i> in order to use this
-	  application.  For now, you can get one by making up a domain name like
-	  <strong>alice.databox1.com</strong>.
+	  You need a <i>Crosscloud Pod</i> to make full use of this
+	  application.  You can get one from any pod provider (or by
+	  running <a href="http://github.com/sandhawke/mapleseed/">your own server</a>).
 	  </p>
 
+	  <p>Available pod providers: <span id="avail"></span></p>
+
+	  <p><i>NOTE: This is a <b>temporary mock-up</b>.  Behind the smoke and mirrors these servers are actually using the same database.  Sorry, but that means you can't add your own server to the system yet.</i></p>
+
+	  <p>Alternatively, you may enter the domain name (or URL) of your pod, like
+	  <a href="http://alice.databox1.com/">alice.databox1.com</a>.</p>
+
 	  <div id="msg" style="font-weight: bold; font-size: 140%; color: red;"></div>
-	  <p> Your Pod URL: <input id="podurl_v013" type="text"
+	  <p> Your Pod: <input id="podurl_v013" type="text"
 	  size="30"></input>
       </p>
 
