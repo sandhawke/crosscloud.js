@@ -6,7 +6,7 @@ if [ ! -f browser/podlogin.js -a -f deploy.sh ] ; then
 fi
 
 VERSION=0.1.4-alpha-`id -un`
-# VERSION=0.1.4-beta1
+# VERSION=0.1.4-beta2
 echo VERSION=$VERSION
 
 
