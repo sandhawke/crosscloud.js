@@ -1,6 +1,6 @@
 {
   "name": "crosscloud",
-  "version": "0.1.4-0",
+  "version": "0.1.4-1",
   "description": "Client library for crosscloud-style (LDP-inspired) data sharing ",
   "main": "lib/crosscloud.js",
   "repository": {
