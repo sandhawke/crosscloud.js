@@ -158,8 +158,8 @@ string "blue" and a size property with the value being the number 3
 { size: { '$exists': true } }
 ```
 
-OHHHH!!!!  IDEA: Instead of that MongoDB syntax (which is going to
-interfear with nested queries/objects if we get them), let's do this:
+OHHHH!!!!  IDEA: Instead of that MongoDB syntax (which is likely to
+interfere with nested queries/objects if we get them), let's do this:
 
 ```javascript
 { "size exists": true }
@@ -171,6 +171,19 @@ which works if we say property names MUST NOT contain whitespace.
 { "color in": ["red", "green", "blue"] }
 
 { "size <=": 3 }
+```
+
+This would let us do:
+
+```javascript
+{ mother: { _id: motherURL } }
+```
+
+and even nested queries (which we might not want to support for
+performance reasons):
+
+```javascript
+{ mother: { "name matches": ".*ary .*"  } }
 ```
 
 ISSUE: Can this be changed while the query is running?
