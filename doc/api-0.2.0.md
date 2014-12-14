@@ -15,26 +15,28 @@ In a modern browser:
 In node.js:
 
 ```shell
-  npm install crosscloud
+npm install crosscloud
 ```
 ...
 ```javascript
-  var crosscloud = require("crosscloud");
+var crosscloud = require("crosscloud");
 ```
 
 The API is the same in both environments, based off the "crosscloud"
 object, which is global in the browser.
 
 
-Setting Up Connection
-=====================
+Setting Up a Connection
+=======================
 
 To create a crosscloud.Client object which serves as local proxy for the
 user's personal data store (or "pod"):
 
- var pod = crosscloud.connect()
- // exactly the same as
- var pod = new crosscloud.Client()
+```javascript
+var pod = crosscloud.connect()
+// exactly the same as
+var pod = new crosscloud.Client()
+```
 
 In this documentation, we call this variable "pod", but "db" or
 "client" would also be a good names for it.
@@ -52,55 +54,58 @@ Sending Data with Push
 
 Add some data to user's pod, usually in response to user action:
 
- pod.push(obj)
+```javascript
+pod.push(obj);
+```
 
 `obj` is an object suitable for use with JSON (no reference loops, no
 methods).  Array values are allowed, but nested objects are not yet
 supported.
 
-This function returns a Promise which can be used to handle errors or
-perform actions upon a successful write.  In many applications it is
-safe to ignore the return value and rely on the default error handler.
+This function returns a [Promise](https://www.promisejs.org/) which
+can be used to handle errors or perform actions upon a successful
+write.  In many applications it is safe to ignore the return value and
+rely on the default error handler.
 
 The default behavior is this: 
 
 * The first time `obj` is pushed, it will be added to the user's pod
-  as a new data page.   Once this is done, obj._id will be set to the
+  as a new data page.   Once this is done, `obj._id` will be set to the
   URL of this page and the returned Promise will be resolved.
 * Later calls using the same `obj` will update the page created by the
   first call.  To remove a property, set it to null, rather than
   deleting it from the object.  Deleting a property will make its
   value on the server not be affected by the push.
 * If another process (perhaps the same user in another window)
-  modifies the page, pod.push() will fail with a
+  modifies the page, `pod.push()` will fail with a
   concurrent-modification error.
 
 These default behaviors may be modified by using system properties of
 `obj`, which all start with an underscore.  In many applications,
 there is no need pay attention to these properties.
 
-* _id is the URL of the data page
-* _etag indicates which version was last seen from the server
+* `_id` is the URL of the data page
+* `_etag` indicates which version was last seen from the server
 
 Coming soon:
-* _public set to true to make the page public
-* _allowedToRead is a set of URLs of entities allowed to read this page.
-  Like myObj._allowedToRead['http://user1.example.com/'] = true.  Ignored
-  if _public === true.
-* _suggestedName is a string to convert to the last part of the new URL.
+* `_public` set to true to make the page public
+* `_allowedToRead` is a set of URLs of entities allowed to read this page.
+  Like `myObj._allowedToRead['http://user1.example.com/'] = true`.  Ignored
+  if `_public === true`.
+* `_suggestedName` is a string to convert to the last part of the new URL.
   Only used at creation time.
-* _delete is used to signal that the page is or should be deleted.   This 
+* `_delete` is used to signal that the page is or should be deleted.   This 
   allows deletions to be largely treated as just another kind of data overlay.
-* _transient (or _ttl:0 ?) flags the object as short-lived.  It will
+* `_transient` (or `_ttl:0` ?) flags the object as short-lived.  It will
   make its way through to currently-waiting queries, but will not
   remain around for later queries to find.  Of course, someone can
-  make a non-transient copy.  _transient objects might only have a
-  _tmpId and cannot be updated.
+  make a non-transient copy.  `_transient` objects might only have a
+  tmpId, not a real URL.
 
-As a special case, _id values which begin "_:" can be set by the
-application to refer to objects which have not yet been assigned a
+As a special case, `_id` values which begin "_:" can be set by the
+application to identify objects which have not yet been assigned a
 proper URL _id by the server.  This allows interlinked (even looping)
-structures to be push()ed without waiting for server responses for
+structures to be `push()`ed without waiting for server responses for
 each object.  The tmpIds can be used for the remainder of the session,
 as a mapping will be maintained by the server and/or the library.
 
@@ -131,29 +136,39 @@ supported.
 
 The template language is inspired by MongoDB:
  
- { color: "blue" }
+```javascript
+{ color: "blue" }
+```
 
 matches all pages which have a color property with the value being the
 string "blue".
 
- { color: "blue",
-   size: 3 }
+```javascript
+{ color: "blue",
+  size: 3 }
+```
 
 matches all pages which have a color property with the value being the
 string "blue" and a size property with the value being the number 3
 (not the string "3").
 
- { size: { '$exists': true } }
+```javascript
+{ size: { '$exists': true } }
+```
 
 IDEA:  allow this to be written as
 
- { "size exists": true }
+```
+{ "size exists": true }
+```
 
 which works if we say property names MUST NOT contain whitespace.
 
- { "color in": ["red", "green", "blue"] }
+```
+{ "color in": ["red", "green", "blue"] }
 
- { "size <=": 3 }
+{ "size <=": 3 }
+```
 
 ISSUE: Can this be changed while the query is running?
 
@@ -170,23 +185,27 @@ Sets the query to have at most n results at any point in time.
 
 This MAY be changed while the query is running.  For instance a "show
 more" options can simply increase the limit, with no need to create a
-new query.  q.limit() returns the limit as currently most recently
+new query.  `q.limit()` returns the limit as currently most recently
 confirmed by the server.
 
-Almost always used along with the q.sort(...) method.  Without that,
+Almost always used along with the `q.sort(...)` method.  Without that,
 it's undefined ''which'' n pages will be the result of the query.
 
 ### q.select([prop1, prop2, ...]);
 
 Limits the query to only returning the given properties of each
-matched patch.  "_id" and "_etag" are implicitely always this list,
+matched patch.  `_id` and `_etag` are implicitely always this list,
 since they are needed internally.   
 
- q.select([]);
+```javascript
+q.select([]);
+```
 
 makes it so only _id and _etag will be reported for matches.
 
- q.select(q.DEFAULT);
+```javascript
+q.select(q.DEFAULT);
+```
 
 removes the selection, returning to the default of returning all
 available, defined properties.
@@ -253,20 +272,22 @@ to "Incremental-Style" which is detailed in the next section.
 
 This can be done easily with the gatherInto method on queries:
 
- var buf = {};
- q.gatherInto(buf);
+```javascript
+var buf = {};
+q.gatherInto(buf);
+```
 
 This makes buf into an object where the query results are gathered and
 stored.  At any time, the client's current view of the query results
 can be seen in the buf.results array:
 
- ...
- buf.results[index]
- ...
+```javascript
+buf.results[index]
+```
 
 This allows a very simple design like:
 
-```
+```javascript
  var buf = {};
  q = pod.query()
         .filter({ ... })
@@ -285,8 +306,10 @@ will work fine, but it will be slower to respond and less efficient
 than a slight variation allowed by two additional methods which are
 added to buf:
 
- buf.waitForChange(min, max).then(...)
- buf.waitForSearch(min, max).then(...)
+```
+buf.waitForChange(min, max).then(...);
+buf.waitForSearch(min, max).then(...);
+```
 
 Both of these call the then() function at a "good" time to use the
 gathered results.  Specifically, waitForChange resolves whenever the
@@ -302,7 +325,7 @@ reached.
 
 Typical usage:
 
-```
+```javascript
  var buf = {};
  q = pod.query()
         .filter({ ... })
@@ -331,9 +354,9 @@ regeneration routine does not run continuously.
 The buf object also serves as an associative array from page ids to
 the objects themselves:
 
- ...
- assert( buf[id]._id === id );
- ...
+```javascript
+assert( buf[id]._id === id );
+```
 
 (This will never conflict with "results" or the below methods because
 ids always contain a colon or a slash character.)
@@ -374,6 +397,7 @@ pull(obj).then(...)
 
 Equivalent to:
 
+```javascript
 function pull(obj) {
   return new Promise(function (resolve, reject) {
     var q = this.query()
@@ -386,21 +410,49 @@ function pull(obj) {
        .on('error', reject);
   });
 }
+```
 
 delete(obj).then(...)
 ---------------------
 
 Equivalent to:
 
+```javascript
 function delete(id) {
  return this.push({ _id:id, _delete:true })
 }
+```
 
 
 User Authentication
 ===================
 
-TBD
+(Needs more details, but most applications can ignore this.)
+
+ 
+```javascript
+var auth = pod.loginManager;
+```
+
+auth.on('login', ...)
+---------------------
+
+auth.on('logout', ...)
+----------------------
+
+If the logout handler is able to fully clear all data from the old
+user, it should call `event.userDataCleared()`.  If no event listener
+calls that (synchronously), then the auth system will force a page
+reload when the user logs out, so the old data is flushed.
+
+auth.requireLogin(message)
+--------------------------
+
+auth.forceLogout()
+------------------
+
+
+
 
 
 
