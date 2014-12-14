@@ -1,4 +1,5 @@
-'''This is a prospective draft'''
+**This is a prospective draft, under discussion.  Parts of it are written
+with different verb tenses.**
 
 This is a javascript client library for the 
 [crosscloud architecture](http://crosscloud.org/).
@@ -215,7 +216,7 @@ new query.  `q.limit()` returns the limit as currently most recently
 confirmed by the server.
 
 Generally used with the `q.sort(...)` method.  Without that,
-it's undefined ''which'' n pages will be the result of the query.
+it's undefined _which_ n pages will be the result of the query.
 
 ### q.select([prop1, prop2, ...]);
 
@@ -385,32 +386,34 @@ Incremental-Style Applications
 
 Queries emit the following events:
 
-* ''appear'' occurs when a new page is found that qualifies to be in
+* **appear** occurs when a new page is found that qualifies to be in
   the result set.  event.newData is an object with all the properties
   of the page (or those listed in q.properties, if that is used).  If
-  this is a page `push()`ed by this same process, the object '''may'''
-  be the same JavaScript object.
+  this is a page `push()`ed by this same process, the object **may**
+  be the same JavaScript object.  The system wont care if you modify
+  it, but other parts of your code might.
 
-* ''disappear'' occurs when page previously reported via Appear no longer
+* **disappear** occurs when page previously reported via Appear no longer
   qualifies to be in the result set.  event.oldURL is the _id of the
   page that has disappeared.
 
-* ''overlay'' occurs when a page in the results set (previously reported
+* **overlay** occurs when a page in the results set (previously reported
   via Appear) has one or more of its visible properties modified.
   event.overlay is an overlay object which, applied to the previous
   copy, will make an up-to-date one.
 
-* ''stable'' occurs each time the server is able to determine that all
+* **stable** occurs each time the server is able to determine that all
   result state changes that could reasonably be reported (via Appear,
   Disappear, and Overlay) has been reported.  In some cases, where
-  most data is remote or highly dynamic, this might never occur.
+  most data is remote or highly dynamic, this might never occur.  This
+  is what what waitForSearch() waits for.
 
-* ''stop'' occurs when the query is done.  No more events will occur
+* **stop** occurs when the query is done.  No more events will occur
   for this query.
 
-* ''error'' occurs in various conditions.  event.error will be an Error
-  object, and additional properties will be set based on the kind of error
-  such as: ...?
+* **error** occurs in various conditions.  event.error will be an
+  Error object, and additional properties will be set based on the
+  kind of error.  Specifically, ...?
 
 
 pull(obj).then(...) 
@@ -423,8 +426,8 @@ function pull(obj) {
   return new Promise(function (resolve, reject) {
     var q = this.query()
        .filter({_id:obj._id})
-       .on('Appear', function(page) {
-           helpers.overlay(obj, page);
+       .on('appear', function(event) {
+           helpers.overlay(obj, event.page);
            q.stop();
            resolve();
        })
@@ -432,6 +435,26 @@ function pull(obj) {
   });
 }
 ```
+
+q = pod.autopull(obj)
+---------------------
+
+Equivalent to:
+
+```javascript
+function pull(obj) {
+   var q = this.query()
+       .filter({_id:obj._id})
+       .on('appear', function(event) {
+           helpers.overlay(obj, event.page);
+       })
+   obj._autopullQuery = q;
+   return q
+}
+```
+
+Aka "pod.keepFresh"
+
 
 delete(obj).then(...)
 ---------------------
@@ -445,37 +468,46 @@ function delete(id) {
 ```
 
 
-User Authentication
-===================
+Other
+=====
 
-(Needs more details, but most applications can ignore this.)
+TBD
 
- 
+Maybe: 
+
 ```javascript
-var auth = pod.loginManager;
+// there is an automatic query of the user's public profile
+// and whatever other bits are visible to this app
+pod.user._id
+pod.user.name
+pod.user.imageURL
+
+// you can set things, then pod.push(pod.user) .. it's live
+// it's autopulled + might entirely switch on logout/login
+
+pod.on('userChange', ...)
+pod.rejectUser(message)
+
+pod.focusURL
+// or crosscloud.focusURL
+// or crosscloud.focusPage
+
+// for testing, at least...
+crosscloud.connect({loginManager:podlogin})
+
+pod.vocabspec.properties.name = {
+  defn: "....",
+};
+// although that style means you lose old data when you change your
+// spec, so best to make it another file.
+pod.vocabspec('vocabspec.json');
+// OR it's looked for there automatically!!
+//
+// without it, "foo" gets turned into (your-origin)/vocab/foo
+// (which isn't completely crazy)
+// and deref to /vocab is hardcoded to give you grief if it's 404?  :-)
+
 ```
-
-auth.on('login', ...)
----------------------
-
-auth.on('logout', ...)
-----------------------
-
-If the logout handler is able to fully clear all data from the old
-user, it should call `event.userDataCleared()`.  If no event listener
-calls that (synchronously), then the auth system will force a page
-reload when the user logs out, so the old data is flushed.
-
-auth.requireLogin(message)
---------------------------
-
-auth.forceLogout()
-------------------
-
-
-
-
-
 
 More details at http://crosscloud.org/latest
 
