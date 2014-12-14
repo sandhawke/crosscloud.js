@@ -8,13 +8,19 @@ INSTALL
 
 In a modern browser:
 
- <script src="http://crosscloud.org/0.1.3/crosscloud.js"></script>
+```html
+<script src="http://crosscloud.org/0.1.3/crosscloud.js"></script>
+```
 
 In node.js:
 
+```shell
   npm install crosscloud
-  ...
+```
+...
+```javascript
   var crosscloud = require("crosscloud");
+```
 
 The API is the same in both environments, based off the "crosscloud"
 object, which is global in the browser.
