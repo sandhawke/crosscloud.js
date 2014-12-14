@@ -127,6 +127,8 @@ Setting up a Query
 
 Creates a query.  Nothing begins running until later, when q.start() is called.
 
+All the query methods (below) return the query, so they can be chained.
+
 ### q.filter(templateObj);
 
 Sets a basic template for which pages are to be returned.  Later calls
@@ -156,21 +158,32 @@ string "blue" and a size property with the value being the number 3
 { size: { '$exists': true } }
 ```
 
-IDEA:  allow this to be written as
+OHHHH!!!!  IDEA: Instead of that MongoDB syntax (which is going to
+interfear with nested queries/objects if we get them), let's do this:
 
-```
+```javascript
 { "size exists": true }
 ```
 
 which works if we say property names MUST NOT contain whitespace.
 
-```
+```javascript
 { "color in": ["red", "green", "blue"] }
 
 { "size <=": 3 }
 ```
 
 ISSUE: Can this be changed while the query is running?
+
+More system properties are available for filtering and are returned in
+query data:
+
+* _lastModified is the time any value of the page was last modified 
+  according to the server hosting it, in RFC-3339 nanosecond format.
+* _owner is the URL of the site which owns the page
+
+ISSUE: can we make the time be in a data format instead of as a string?
+ISSUE: should that be ownerURL, since it's not an object?
 
 ### q.sort(propertyName);
 
@@ -188,7 +201,7 @@ more" options can simply increase the limit, with no need to create a
 new query.  `q.limit()` returns the limit as currently most recently
 confirmed by the server.
 
-Almost always used along with the `q.sort(...)` method.  Without that,
+Generally used with the `q.sort(...)` method.  Without that,
 it's undefined ''which'' n pages will be the result of the query.
 
 ### q.select([prop1, prop2, ...]);
