@@ -42,12 +42,21 @@ var pod = new crosscloud.Client()
 In this documentation, we call this variable "pod", but "db" or
 "client" would also be a good names for it.
 
-In general, the application is not involved with how the user logs in
-or with the details of communication with the pod.
+Once this call returns, the application can immediately begin to make
+requests, as detailed below.  These requests will usually complete
+10-100ms to complete, most of the delay due to network round trip
+time.  In some cases it might take much longer for them to complete,
+perhaps because the user is in the process of logging in or the
+network has gone done.  In general, applications do not need to handle
+these delays specially; in these situations it should be fine for the
+application to simply not respond.
+
+All calls return immediately (asynchronously).  Most either return a
+Promise or an EventEmitter which is used to provide asynchronous
+results.
 
 Coming soon: For testing purposes, certain options may be passed to
 these calls.
-
 
 
 Sending Data with Push
