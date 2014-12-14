@@ -265,11 +265,11 @@ to the value set of the pod client.
 
 * min is the minimum number of milliseconds between events of
   interest; any events that occur more often than this are merged.
-  Defaults to 30.  This is useful when polling is not needed and data
-  is changing rapidly in place (eg a counter incrementing), so merging
-  events will result in much less data transmission.  Zero is not an
-  allowed value, since in theory values could be changing
-  continuously.
+  Defaults to 33ms (about 30 events per second).  This is useful when
+  polling is not needed and data is changing rapidly in place (eg a
+  counter incrementing), so merging events will result in much less
+  data transmission.  Zero is not an allowed value, since in theory
+  values could be changing continuously.
 
 * max is the maximum number of milliseconds between events, assuming
   there are events to be reported.  This can be used to raise an error
@@ -293,10 +293,10 @@ Refresh-Style Applications
 
 Many applications, or parts of applications, are best written in
 "refresh style", where they simply create new HTML to display the
-latest data each time the query results change.  This is in contrast
-to "Incremental-Style" which is detailed in the next section.
+latest data each time the query results change.  (This is in contrast
+to "Incremental-Style" which is detailed in the next section.)
 
-This can be done easily with the gatherInto method on queries:
+Refresh-style can be done easily with the gatherInto method on queries:
 
 ```javascript
 var buf = {};
@@ -367,34 +367,29 @@ Typical usage:
     .then(display);
 ```
 
-This uses a Handlebars template to display new query results whenever
-they change.  Specifically, for the initial search, is waits up to 1
-seconds before displaying anything, so the user doesn't have to watch
-the initial results come in peicemeal.  After that, the screen is
-updated up to 10 times per second (ever 100ms) as results change.
-
-This behaves well in most situations.  The DOM is only regenerated
-when the data changes, and even if the data changes very rapidly, the
-regeneration routine does not run continuously.
+This is a modification of the previous example to use no CPU time
+until the data changes.  When the data does change, this code modifies
+the DOM immendiately, but never more than 10 times per second
+(1000ms/s / 100ms).  On the initial display, this code waits for up to
+a second (1000ms) for the initial results to be found, so that users
+are generally spared seeing items that will soon be pushed out of
+the the top n items as more matches are found.
 
 The buf object also serves as an associative array from page ids to
-the objects themselves:
-
-```javascript
-assert( buf[id]._id === id );
-```
-
-(This will never conflict with "results" or the below methods because
-ids always contain a colon or a slash character.)
+the objects themselves.  For every page id in the results,
+`buf[id]._id === id`.  This will never conflict with method names or
+property names like "results" because ids always contain a colon.
 
 Incremental-Style Applications
 ------------------------------
 
 Queries emit the following events:
 
-* ''appear'' occurs when a new page is found that qualifies to be in the
-  result set.  event.newData is and object with all the properties of
-  the page (or those listed in q.properties, if that is used).
+* ''appear'' occurs when a new page is found that qualifies to be in
+  the result set.  event.newData is an object with all the properties
+  of the page (or those listed in q.properties, if that is used).  If
+  this is a page `push()`ed by this same process, the object '''may'''
+  be the same JavaScript object.
 
 * ''disappear'' occurs when page previously reported via Appear no longer
   qualifies to be in the result set.  event.oldURL is the _id of the
