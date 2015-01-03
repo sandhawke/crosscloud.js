@@ -1,17 +1,17 @@
-**This is a prospective draft, under discussion.  Parts of it are written
-with different verb tenses.**
+**This is a prospective draft, under discussion.   Not implemented yet!!**
 
-This is a javascript client library for the 
-[crosscloud architecture](http://crosscloud.org/).
+This is a Javascript client library for the 
+[Crosscloud architecture](http://crosscloud.org/).
 
-INSTALL
+Install
 =======
 
 In a modern browser:
 
 ```html
-<script src="http://crosscloud.org/0.1.3/crosscloud.js"></script>
+<script src="http://crosscloud.org/0.2.0/crosscloud.js"></script>
 ```
+
 
 In node.js:
 
@@ -23,40 +23,55 @@ npm install crosscloud
 var crosscloud = require("crosscloud");
 ```
 
-The API is the same in both environments, based off the "crosscloud"
+The API is the same in both environments, based off the `crosscloud`
 object, which is global in the browser.
 
 
-Setting Up a Connection
-=======================
+The Client Object
+=================
 
-To create a crosscloud.Client object which serves as local proxy for the
-user's personal data store (or "pod"):
+Access to the user's data is through a `crosscloud.Client` object which
+serves as as local proxy for the user's personal data store (or
+"pod").  There is one default instance, which may be given a short
+name, like this:
 
 ```javascript
-var pod = crosscloud.connect()
-// exactly the same as
-var pod = new crosscloud.Client()
+var pod = crosscloud.defaultClient;
 ```
 
 In this documentation, we call this variable "pod", but "db" or
 "client" would also be a good names for it.
 
-Once this call returns, the application can immediately begin to make
-requests, as detailed below.  These requests will usually complete
-10-100ms to complete, most of the delay due to network round trip
-time.  In some cases it might take much longer for them to complete,
-perhaps because the user is in the process of logging in or the
-network has gone done.  In general, applications do not need to handle
-these delays specially; in these situations it should be fine for the
-application to simply not respond.
+In some cases, applications may need multiple client objects, which
+can be obtained like:
 
-All calls return immediately (asynchronously).  Most either return a
-Promise or an EventEmitter which is used to provide asynchronous
-results.
+```javascript
+var pod1 = new crosscloud.Client(options1)
+var pod2 = new crosscloud.Client(options2)
+```
 
-Coming soon: For testing purposes, certain options may be passed to
-these calls.
+The client methods, detailed below, may be used at any time, even when
+the client is not actually connected to the user's data server.  In
+fact, during the course of processing a request, the client might
+disconnect from the server and reconnect many times.  In general,
+applications do not need to pay attention to this, if they use
+appropriate asynchronous logic.
+
+In general, requests complete fast enough to appear instant to the
+user, but sometimes requests will take minutes or never complete, such
+as if the network isn't available, or the user has logged out.  All
+client methods are therefore asynchronous and return immediately.  In
+general, they return either a Promise or an EventEmitter, which is
+then used to obtain results asynchronously.
+
+
+### Client configuration
+
+Client object have properties which can be changed at runtime, or
+passed as options to the call to `new crosscloud.Client(...)`:
+
+* loginManager: used in place of `podlogin`, the library which
+  normally handles user login/logout operations.  Advanced use only.
 
 
 Sending Data with Push
@@ -75,7 +90,15 @@ supported.
 This function returns a [Promise](https://www.promisejs.org/) which
 can be used to handle errors or perform actions upon a successful
 write.  In many applications it is safe to ignore the return value and
-rely on the default error handler.
+rely on the default error handler.  Resolution may be useful for
+indicating when data is properly saved.
+
+```javascript
+markAsSaved(false)
+pod.push(obj)
+   .then(function () { markAsSaved(true) })
+```
+
 
 The default behavior is this: 
 
@@ -96,8 +119,6 @@ there is no need pay attention to these properties.
 
 * `_id` is the URL of the data page
 * `_etag` indicates which version was last seen from the server
-
-Coming soon:
 * `_public` set to true to make the page public
 * `_allowedToRead` is a set of URLs of entities allowed to read this page.
   Like `myObj._allowedToRead['http://user1.example.com/'] = true`.  Ignored
@@ -106,16 +127,16 @@ Coming soon:
   Only used at creation time.
 * `_delete` is used to signal that the page is or should be deleted.   This 
   allows deletions to be largely treated as just another kind of data overlay.
-* `_transient` (or `_ttl:0` ?) flags the object as short-lived.  It will
+* `_transient` flags the object as short-lived.  It will
   make its way through to currently-waiting queries, but will not
   remain around for later queries to find.  Of course, someone can
-  make a non-transient copy.  `_transient` objects might only have a
-  tmpId, not a real URL.
+  make a non-transient copy.  (`_transient` objects might only have a
+  tmpId, not a real URL, as below.)
 
 As a special case, `_id` values which begin "_:" can be set by the
 application to identify objects which have not yet been assigned a
-proper URL _id by the server.  This allows interlinked (even looping)
-structures to be `push()`ed without waiting for server responses for
+proper _id by the server.  This allows interlinked (even looping)
+structures to given to `push()` without waiting for server responses for
 each object.  The tmpIds can be used for the remainder of the session,
 as a mapping will be maintained by the server and/or the library.
 
@@ -123,10 +144,12 @@ Getting Data With Query
 =======================
 
 Crosscloud queries are continuously processed and can operate on
-transient data.  They are not like SQL ACID queries which reflect the
-state of a database at some point in time.  Instead they involve a
-best-effort process to gather all data pages matching certain
-criteria.
+transient data.  They are not like SQL queries which reflect the state
+of a database at some point in time.  Instead they involve gathering
+all available data pages which match criteria at approximately the
+time the result is returned.  (Updates to pages themselves are ACID
+&mdash; with each page `push` being a transaction &mdash; but that's a
+much weaker guarantee.)
 
 
 Setting up a Query
@@ -139,12 +162,11 @@ Creates a query.  Nothing begins running until later, when q.start() is called.
 
 All the query methods (below) return the query, so they can be chained.
 
-### q.filter(templateObj);
+### q.filter(shape);
 
-Sets a basic template for which pages are to be returned.  Later calls
-overlay earlier ones, which amounts to a conjunction of the queries as
-long as they do not use the same properties.  Disjunction is not
-supported.
+Sets a basic template shape for which pages are to be returned.  
+
+Repeated calls to `filter` on the same query are not currently defined.
 
 The template language is inspired by MongoDB:
  
@@ -164,18 +186,15 @@ matches all pages which have a color property with the value being the
 string "blue" and a size property with the value being the number 3
 (not the string "3").
 
-```javascript
-{ size: { '$exists': true } }
-```
-
-OHHHH!!!!  IDEA: Instead of that MongoDB syntax (which is likely to
-interfere with nested queries/objects if we get them), let's do this:
+Beyond checking values, the syntax diverges from MongoDB.  To check if
+the size has *any* (non-null) value:
 
 ```javascript
 { "size exists": true }
 ```
 
-which works if we say property names MUST NOT contain whitespace.
+This syntax works because property names are restricted to being C
+identifiers.
 
 ```javascript
 { "color in": ["red", "green", "blue"] }
@@ -183,30 +202,35 @@ which works if we say property names MUST NOT contain whitespace.
 { "size <=": 3 }
 ```
 
-This would let us do:
+Also, a form of sub-queries:
 
 ```javascript
-{ mother: { _id: motherURL } }
+{ "car.color": "red" }
 ```
 
-and even nested queries (which we might not want to support for
-performance reasons):
+Only properties which are mentioned are returned by a query.  If you
+want a value and don't care if it exists, use the operator "wanted":
 
 ```javascript
-{ mother: { "name matches": ".*ary .*"  } }
+{ "color": "red",
+  "size exists": true,
+  "location.lat wanted": true }
+  "location.lon wanted": true }
+
 ```
+A query result `page` would have these defined: `page.color`, `page.size`, `page.location.lat`, and `page.location.lon`.   The last two might be `null`.   The first will just have the value "red", as you gave it.   `page.location` will never be `null`.
 
 ISSUE: Can this be changed while the query is running?
 
 More system properties are available for filtering and are returned in
 query data:
 
-* _lastModified is the time any value of the page was last modified 
-  according to the server hosting it, in RFC-3339 nanosecond format.
-* _owner is the URL of the site which owns the page
-
-ISSUE: can we make the time be in a data format instead of as a string?
-ISSUE: should that be ownerURL, since it's not an object?
+* _lastModified is the time any value of the page was last modified
+  according to the server hosting it, in RFC-3339 format.  It may
+  include fractions of a second.  (ISSUE: can we make this actually
+  be a time value, instead of a string?)
+* _owner is a sub-page, available at _ownerURL, so you can do
+  _owner.name, _owner._id, etc.
 
 ### q.sort(propertyName);
 
@@ -227,27 +251,6 @@ confirmed by the server.
 Generally used with the `q.sort(...)` method.  Without that,
 it's undefined _which_ n pages will be the result of the query.
 
-### q.select([prop1, prop2, ...]);
-
-Limits the query to only returning the given properties of each
-matched patch.  `_id` and `_etag` are implicitely always this list,
-since they are needed internally.   
-
-```javascript
-q.select([]);
-```
-
-makes it so only _id and _etag will be reported for matches.
-
-```javascript
-q.select(q.DEFAULT);
-```
-
-removes the selection, returning to the default of returning all
-available, defined properties.
-
-(To actually obtain all properties, one must do something else TBD.)
-
 ### q.start();
 
 Begins actual query execution
@@ -267,7 +270,7 @@ Undo a previous q.pause(), resuming getting results.
 ### q.eventGap(poll, min, max)
 
 Indicate the timing constraints for events for this query.  Defaults
-to the value set of the pod client. 
+to the value set for the pod client. 
 
 * poll is the number of milliseconds that should ideally occur between
   events being reported, assuming polling is necessary.  Defaults to
@@ -290,13 +293,21 @@ to the value set of the pod client.
 Accumulates the current result set in the application-provided buffer
 object, as detailed below, under "Refresh-Style".
 
-### q.on(event, handler)
+### q.on(event, listener)
+
+Add `listener` to the list of functions to be called whenever `event`
+occurs for this query.
 
 Each query is an EventEmitter, implementing .on() (alias
-addEventListener and addListener) and removeListener (alias
+addEventListener and addListener) and off() (alias removeListener and
 removeEventListener), emitting events so the application can respond
 to the progress of the query, as explained below under
 "Incremental-Style".
+
+### q.off(event, listener)
+
+Removes `listener` from to the list of functions to be called
+whenever `event` occurs for this query.
 
 Refresh-Style Applications
 --------------------------
@@ -342,22 +353,26 @@ will work fine, but it will be slower to respond and less efficient
 than a slight variation allowed by two additional methods which are
 added to buf:
 
-```
-buf.waitForChange(min, max).then(...);
-buf.waitForSearch(min, max).then(...);
+```javascript
+buf.waitForChange().then(...);
+buf.waitForSearch().then(...);
 ```
 
 Both of these call the then() function at a "good" time to use the
 gathered results.  Specifically, waitForChange resolves whenever the
 buf.results changes at all, including properties of the specific
-result pages.  waitforSearch is somewhat more decerning and only
+result pages.  waitforSearch is somewhat more discerning and only
 resolves when all the currently available data has been checked.
 
+```javascript
+buf.waitForChange(min, max).then(...);
+buf.waitForSearch(min, max).then(...);
+```
+
 Both methods take additional min and max parameters which specify in
-milliseconds how long they may take.  They will never resolve, calling
-then(), in less that min milliseconds, and they will automatically
-resolve after max milliseconds, even if their condition hasn't been
-reached.
+milliseconds how long they may take.  They will never resolve in less
+that min milliseconds, and they will automatically resolve after max
+milliseconds, even if their condition hasn't been reached.
 
 Typical usage:
 
@@ -377,13 +392,14 @@ Typical usage:
     .then(display);
 ```
 
-This is a modification of the previous example to use no CPU time
-until the data changes.  When the data does change, this code modifies
-the DOM immendiately, but never more than 10 times per second
-(1000ms/s / 100ms).  On the initial display, this code waits for up to
-a second (1000ms) for the initial results to be found, so that users
-are generally spared seeing items that will soon be pushed out of
-the the top n items as more matches are found.
+This is a modification of the previous example where application code
+is run only when the data changes.  When the data does change, this
+code modifies the DOM immediately, but never more than 10 times per
+second (1000ms/s / 100ms).  On the initial display, this code waits
+for up to a second (1000ms) for the initial results to be found.
+Without this initial delay, users might be briefly shown items which
+are possible candidates for the top-n results but will soon be
+determined not to be.  This may confuse or annoy users.
 
 The buf object also serves as an associative array from page ids to
 the objects themselves.  For every page id in the results,
@@ -396,39 +412,48 @@ Incremental-Style Applications
 Queries emit the following events:
 
 * **appear** occurs when a new page is found that qualifies to be in
-  the result set.  event.newData is an object with all the properties
-  of the page (or those listed in q.properties, if that is used).  If
-  this is a page `push()`ed by this same process, the object **may**
-  be the same JavaScript object.  The system wont care if you modify
-  it, but other parts of your code might.
+  the result set.  `event.newData` is an object with all the requested
+  properties of the page.  If this this page was created or updated
+  via a call to `push() from this same process, the `newData` object
+  **may** be the same Javascript object, so be careful about modifying
+  it.  (The system doesn't care if you modify it, but other parts of
+  your code might.)
 
-* **disappear** occurs when page previously reported via Appear no longer
-  qualifies to be in the result set.  event.oldURL is the _id of the
-  page that has disappeared.
+* **disappear** occurs when page previously reported via `appear` no
+  longer qualifies to be in the result set.  `event.oldURL` is the _id
+  of the page that has disappeared.
 
-* **overlay** occurs when a page in the results set (previously reported
-  via Appear) has one or more of its visible properties modified.
-  event.overlay is an overlay object which, applied to the previous
-  copy, will make an up-to-date one.
+* **overlay** occurs when a page in the results set (previously
+  reported via `appear`) has one or more of its visible properties
+  modified.  `event.overlay` is an overlay object which, applied to
+  the previous copy, will make an up-to-date one.  (And *overlay* is
+  just an object which contains new versions of any changed
+  properties.)
 
 * **stable** occurs each time the server is able to determine that all
-  result state changes that could reasonably be reported (via Appear,
-  Disappear, and Overlay) has been reported.  In some cases, where
-  most data is remote or highly dynamic, this might never occur.  This
-  is what what waitForSearch() waits for.
+  changes to the result set that could reasonably be reported (via
+  `appear`, `disappear`, and `overlay`) have been reported.  In some
+  cases, where most data is remote or highly dynamic, this might never
+  occur.  This is what what waitForSearch() waits for.  In many
+  applications, events occur in short bursts (ending with `stable`),
+  with a burst occurring whenever some user does something.
 
-* **stop** occurs when the query is done.  No more events will occur
-  for this query.
+* **stop** occurs when the query is done, either because your app
+  called `q.stop()` or something on the server caused query
+  termination.  No more events will occur for this query.
 
-* **error** occurs in various conditions.  event.error will be an
-  Error object, and additional properties will be set based on the
-  kind of error.  Specifically, ...?
+* **error** occurs in various conditions.  `event.error` will be an
+  `Error` object, and additional properties will be set based on the
+  kind of error.  If the error is fatal for the query, `stop` will
+  occur after the `error`.  (List of possible errors...?)
 
 
-pull(obj).then(...) 
--------------------
+Convenience Methods
+===================
 
-Equivalent to:
+### pull(obj).then(...) 
+
+Something like:
 
 ```javascript
 function pull(obj) {
@@ -445,8 +470,7 @@ function pull(obj) {
 }
 ```
 
-q = pod.autopull(obj)
----------------------
+### q = pod.autopull(obj)
 
 Equivalent to:
 
@@ -465,8 +489,7 @@ function pull(obj) {
 Aka "pod.keepFresh"
 
 
-delete(obj).then(...)
----------------------
+### delete(obj).then(...)
 
 Equivalent to:
 
@@ -476,11 +499,42 @@ function delete(id) {
 }
 ```
 
+Events
+======
 
-Other
-=====
+Pods implement the `EventEmitter` interface, with several useful events:
 
-TBD
+### pod.on(event, listener)
+
+Add `listener` as a function to be called when `event` occurs.
+
+### pod.off(event, listener)
+
+Remove `listener` from the list of function to be called when `event` occurs.
+
+### event: userdata
+
+Some data about the user changed
+
+```javascript
+pod.on('userdata', ...)
+```
+
+### event: logout
+
+The user has explicitly logged out, retracting authentication from
+the app.  Applications MUST at this point remove all stored/cached
+user data.
+
+Note that applications MUST NEVER send user data to some other server,
+unless explicitly and clearly requested by user.
+
+Applications which do not listen for `logout` events are simply
+reloaded when logout occurs, so that state is reset.
+
+
+User Data
+=========
 
 Maybe: 
 
@@ -496,14 +550,30 @@ pod.user.imageURL
 
 pod.on('userChange', ...)
 pod.rejectUser(message)
+```
+
+Focus
+=====
+
+something like:
+
+```javascript
 
 pod.focusURL
 // or crosscloud.focusURL
 // or crosscloud.focusPage
+```
 
-// for testing, at least...
-crosscloud.connect({loginManager:podlogin})
+Sharing Vocabularies
+====================
 
+For integrated apps...
+
+Without this, your apps properties will only see other instance of themselves (and things claiming to be other instances of this app).
+
+something like:
+
+```javascript
 pod.vocabspec.properties.name = {
   defn: "....",
 };
@@ -518,6 +588,10 @@ pod.vocabspec('vocabspec.json');
 
 ```
 
-More details at http://crosscloud.org/latest
+ISSUE: is there a way for an app to see the names (and details) of
+unknown properties of an object?  Something like: pod.properties(id)
+Ohh, how about pod.getVocabspec(id) returns to vocabspec for the
+URL/object.   Then you can add that to yours if you want...
+
 
 

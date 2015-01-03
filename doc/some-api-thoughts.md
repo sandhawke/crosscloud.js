@@ -1,4 +1,6 @@
 
+** Some good ideas, to be mined later **
+
 API Reference: crosscloud.js
 ============================
 
