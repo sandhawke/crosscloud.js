@@ -1,19 +1,19 @@
-This is a javascript client library for the 
-[crosscloud architecture](http://crosscloud.org/).
-
 Crosscloud.js embodies a radical approach to Web Application
-development: it puts the data under user control. This turns out to
-simplify things. When used properly, crosscloud.js tends to make
-applications:
+development: it puts the data under user control. This actually makes
+things better for application developer, too.  When used properly,
+crosscloud.js tends to make applications:
 
 * **Fast:** With simple data flows, applications are often highly
     responsive, especially for multi-user features
-* **Easy to Develop:** You only need to think about the front end, and
-    the model is pretty simple.  (Of course, this is partially a
-    matter of taste.  But we like it.)
+
+* **Easy to Develop:** You only need to think about front end
+    development, and the model is pretty simple.  (Of course, this is
+    partially a matter of taste.  But we like it.)
+
 * **Secure:** Data security becomes the responsibility of the storage
     provider, not your application
-* **Scaleable:** Whether you have 5 users or 5 million, your code
+
+* **Scalable:** Whether you have 5 users or 5 million, your code
     remains the same.  The Crosscloud platform handles the data
     scaling (or will, in theory!).
 * **Polite:** By letting users control their own data and switch
@@ -35,7 +35,7 @@ On the other hand, crosscloud.js and the crosscloud system is:
     versioning so your code wont break immediately, but we might
     remove any feature with only 60-days notice, to avoid the drag of
     old code.
-* **Not decentralized yet:** The servers are partial mockups right now,
+* **Not decentralized yet:** The servers are partial mock-ups right now,
     helping us understand the desired functionality. They'll work
     great for your app, but wont actually give users the promised
     freedom (yet) and certainly wont scale to millions of users.
@@ -43,7 +43,9 @@ On the other hand, crosscloud.js and the crosscloud system is:
 For more:
 
 * **Working with Data Pages**: (TODO!)
-* **API Reference:** [Planned 0.2.0](https://github.com/sandhawke/crosscloud.js/blob/master/doc/planned-api.md)
+* **Version 0.1.3:**: [Overview, with Examples](http://crosscloud.org/0.1.3/)
+* **Version 0.2.0:** [API Reference](https://github.com/sandhawke/crosscloud.js/blob/master/doc/planned-api.md)
+* **Contributed Apps:** (of varying levels of maturity) http://crosscloud.org/contrib
 * **Raise Issues:** [here](https://github.com/sandhawke/crosscloud.js/issues)
-* **Contact:** Sandro Hawke (sandro@w3.org)
+* **Contact:** Sandro Hawke (hawke@mit.edu)
 * **More about Crosscloud:** See http://crosscloud.org/
