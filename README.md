@@ -7,15 +7,15 @@ crosscloud.js tends to make applications:
     responsive, especially for multi-user features
 
 * **Easy to Develop:** You only need to think about front end
-    development, and the model is pretty simple.  (Of course, this is
-    partially a matter of taste.  But we like it.)
+    development, and the model is simple.  (It's sort of a cross
+	between MongoDB and git.)
 
 * **Secure:** Data security becomes the responsibility of the storage
     provider, not your application
 
 * **Scalable:** Whether you have 5 users or 5 million, your code
-    remains the same.  The Crosscloud platform handles the data
-    scaling (or will, in theory!).
+    remains the same.  The network of Crosscloud providers is
+    responsible for handling data scaling.
 
 * **Polite:** By letting users control their own data and switch
     between apps when they want to, you are respecting their freedom,
@@ -31,25 +31,28 @@ If your app were all these things, would your users be delighted?
 
 On the other hand, crosscloud.js and the crosscloud system is:
 
-* **Not ready for "production" use:** This is currently a research
-    project at MIT CSAIL.
+* **Not ready for mission-critical use:** This is currently a
+    research project at MIT CSAIL, supported by a grant from the
+    Knight Foundation.  (Related parts of Crosscloud are supported by
+    other grants.)
 
-* **Not stable:** We're constantly tinkering with the APIs. We do
-    versioning so your code wont break immediately, but we might
-    remove any feature with only 60-days notice, to avoid the drag of
-    old code.
+* **Not stable:** We're constantly tinkering with the APIs.  You can
+    keep using an old version of the library, but because the servers
+    and protocols change, we only try to keeping the old versions
+    working for 60 days.
 
-* **Not decentralized yet:** The servers are partial mock-ups right now,
-    helping us understand the desired functionality. They'll work
-    great for your app, but wont actually give users the promised
-    freedom (yet) and certainly wont scale to millions of users.
+* **Not decentralized:** The servers are partially mock-ups, for
+    research. They work well for most apps, but wont actually give
+    users the promised freedom yet and wont scale past a few hundred
+    users.
 
 For more:
 
 * **Working with Data Pages**: (TODO!)
-* **Version 0.1.3:**: [Overview, with Examples](http://crosscloud.org/0.1.3/)
-* **Version 0.2.0:** [API Reference](https://github.com/sandhawke/crosscloud.js/blob/master/doc/planned-api.md)
-* **Contributed Apps:** (of varying levels of maturity) http://crosscloud.org/contrib
+* **Version 0.1.2 (10 Nov 2014):**: [Overview, with Examples](http://crosscloud.org/0.1.2/)
+* **Version 0.1.3 (9 Dec 2014):**: [Overview, with Examples](http://crosscloud.org/0.1.3/) [Release Notes](http://crosscloud.org/0.1.3/RELEASE.txt)
+* **Version 0.2.0 (planned Jan 2015):** [API Reference](https://github.com/sandhawke/crosscloud.js/blob/master/doc/planned-api.md)
+* **Contributed Apps:** http://crosscloud.org/contrib
 * **Raise Issues:** [here](https://github.com/sandhawke/crosscloud.js/issues)
 * **Contact:** Sandro Hawke (hawke@mit.edu)
 * **More about Crosscloud:** See http://crosscloud.org/
