@@ -45,6 +45,8 @@ On the other hand, crosscloud.js and the crosscloud system is:
 * **Not stable:** We're constantly tinkering.  You can keep using an
     old version of the library, but because the servers and protocols
     change, we only try to keeping old versions working for 60 days.
+    You need to be prepared to update your app promptly, or it may
+    stop working.
 
 * **Not decentralized:** The servers are partially mock-ups, for
     research. They work well for most apps, but wont actually give
