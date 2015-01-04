@@ -32,23 +32,22 @@ things better for application developers, too.  When used properly,
     threaded comments, calendar events are calendar events, etc, no
     matter which apps want to use them.
 
-If your app were all these things, would your users be delighted?
+Do you want your app to be all these things?  Do your users?
 
 On the other hand, crosscloud.js and the crosscloud system is:
 
-* **Not ready for mission-critical use:** This is currently a
-    research project at MIT CSAIL, supported by a grant from the
-    Knight Foundation.  (Related parts of Crosscloud are supported by
-    other grants.)
+* **Not ready for mission-critical use:** This is currently a research
+    project at MIT CSAIL, supported by a grant from the Knight
+    Foundation.  (Development of the Crosscloud servers, protocols,
+    and standards are supported by other grants.)
 
-* **Not stable:** We're constantly tinkering with the APIs.  You can
-    keep using an old version of the library, but because the servers
-    and protocols change, we only try to keeping the old versions
-    working for 60 days.
+* **Not stable:** We're constantly tinkering.  You can keep using an
+    old version of the library, but because the servers and protocols
+    change, we only try to keeping old versions working for 60 days.
 
 * **Not decentralized:** The servers are partially mock-ups, for
     research. They work well for most apps, but wont actually give
-    users the promised freedom yet and wont scale past a few hundred
+    users the promised autonomy yet and wont scale past a few hundred
     users.
 
 For more:
