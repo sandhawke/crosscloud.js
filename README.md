@@ -6,12 +6,17 @@ things better for application developers, too.  When used properly,
 * **Fast:** With simple data flows, applications are often highly
     responsive, especially for multi-user features
 
+* **Social:** The user's social graph is available, along with all the
+    data and activities from the user's contacts, even activities in
+    other apps.  (This is subject to everyone's privacy settings, of
+    course.)
+
 * **Easy to Develop:** You only need to think about front end
-    development, and the model is simple.  (It's sort of a cross
-	between MongoDB and git.)
+    development, and our "data pages" model is simple.  (It's sort of
+    a cross between MongoDB and git.)
 
 * **Secure:** Data security becomes the responsibility of the storage
-    provider, not your application
+    provider, not your application.
 
 * **Scalable:** Whether you have 5 users or 5 million, your code
     remains the same.  The network of Crosscloud providers is
