@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en-US">
+<head>
+<title>Test</title>
+<script src="http://crosscloud.org/!!VERSION!!/crosscloud.js"></script>
+<script src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
+<script src="main.js"></script>
+<style>
+body { 
+  font-family: Arial; 
+}
+.note {
+  margin: 0;
+  padding-left: 2em;
+  font-size: 85%;
+  font-style: italic;
+}
+table {
+    border-width: 5px;
+}
+thead td {
+  background: #ccc;
+}
+tbody tr th {
+  border-bottom: 1px solid #ccc;
+}
+tbody tr:hover {
+ background: #eee;
+}
+td, th {
+ padding: 2px;
+ padding-left: 6px
+}
+
+</style>
+</head>
+<body>
+  <div id="error">JS Not Running</div>
+  <div>
+
+	<h2>Photo Upload/Download<br/><span style="font-size: 70%; color:gray;">Crosscloud Demo Application</span></h2>
+
+
+	<form>
+	  <p>Select image: 
+	  <input type="file" id="upload" name="files"></input>
+	  <input type="file" id="upload2" name="capture" accept="image/*" capture></input>
+	  </p>
+	</form>
+	
+	<img id="preview" src="data:image/png;base64:" height="150" alt="preview of image to be uploaded" /> 
+
+
+	<form id="up">
+	  <p>Select image to upload: <input type="file" id="imagePick" name="files"></input></p>
+	</form>
+	
+	<div id="imagePreview">x
+	</div>
+	
+  </div>
+</body>
+</html>

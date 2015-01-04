@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en-US">
+<head>
+<title>Test</title>
+<script src="http://crosscloud.org/!!VERSION!!/crosscloud.js"></script>
+<script src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
+<script src="http://cdnjs.cloudflare.com/ajax/libs/sigma.js/1.0.3/sigma.min.js"></script>
+<script src="http://cdnjs.cloudflare.com/ajax/libs/handlebars.js/2.0.0/handlebars.min.js"></script>
+<script src="http://crosscloud.org/lib/sigma-1.0.3/plugins/sigma.layout.forceAtlas2/worker.js"></script>
+<script src="http://crosscloud.org/lib/sigma-1.0.3/plugins/sigma.layout.forceAtlas2/supervisor.js"></script>
+<script src="main.js"></script>
+<style>
+body { 
+  font-family: Arial; 
+}
+.note {
+  margin: 0;
+  padding-left: 2em;
+  font-size: 85%;
+  font-style: italic;
+}
+table {
+    border-width: 5px;
+}
+thead td {
+  background: #ccc;
+}
+tbody tr th {
+  border-bottom: 1px solid #ccc;
+}
+tbody tr:hover {
+ background: #eee;
+}
+td, th {
+ padding: 2px;
+ padding-left: 6px
+}
+
+
+#graph-container {
+top: 0;
+bottom: 0;
+left: 0;
+right: 0;
+position: absolute;
+}
+</style>
+</style>
+</head>
+<body>
+  <div id="error">JS Not Running</div>
+  <div>
+
+	<h2>Contacts Editor<br/><span style="font-size: 70%; color:gray;">Crosscloud Demo Application</span></h2>
+
+	<div id="notLoggedIn">
+	  <p>Not logged in.   Use the pod login control (upper right).</p>
+	</div>
+
+	<div id="me">
+	<p>Logged in as <span id="name"></span> <img id="mypic" src="" height="64" alt="your picture"></img></p>
+	</div>
+
+	<hr />
+
+    <p>Add Contact: <input id="addURL" placeholder="http://my.friends.site"" size="60" /></p>
+
+
+	<script id="contact-template" type="text/x-handlebars-template">
+	  <ul class="people_list">
+		{{#each contacts}}
+		<li><a href="{{page.siteURL}}">{{person.name}}</a>
+		<img src="{{person.imageURL}}" height="64" alt="profile picture for this person">
+		<button type="button" onclick="unfriend('{{page._id}}')">remove this contact</button>
+</li>
+
+		{{else}}
+		<li><em>No contacts found</em></li>
+		{{/each}}
+	  </ul>
+	</script>
+
+	<div id="contacts" style="display: none">
+	</div>
+
+	<div style="border: 5px solid grey" id="graph-container">Sigma Goes Here</div>
+  </div>
+</body>
+</html>

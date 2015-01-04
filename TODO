@@ -1,0 +1,25 @@
+Someday we'll move this to an issue tracker.
+
+release typeahead
+
+minipanel, with link to login, logout, profile editor
+micropods
+error on bad pod url
+podbuffer
+forceLogin switch to what kind of login?
+
+documentation
+
+alert() for fileURL
+alert() for falsy query values
+alert() for base.target not set in child mode
+dev-error mechanism other than alert()?
+
+trace/debug app
+
+social graph d3 viewer
+
+release skins?     skin matching logic?
+
+app directory
+
