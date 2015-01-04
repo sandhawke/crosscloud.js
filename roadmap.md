@@ -2,42 +2,78 @@ This is about features that show through to app developers.  Nearly
 all of them require changes to crosscloud.js, the protocol, and the
 servers.
 
+0.1.1 - Released 12 October 2014
+	    
+        first numbered version
 
-0.2.0
+        includes basic pod-control embedded iframe (demo login/logout, no pw)
 
-		push, query, (pull?) as in 0.1.2, but over websockets
+        push, pull, query (returning snapshot of all results)
 
-0.2.1
+		includes hello world app, which is kind of a chat
 
-		big data values (eg pictures)   (?binary data values?)
+0.1.2 - Released 10 November 2014
 
-		single-item mode (aka focus mode, aka skins)
+        added simple profile editor
 
-		delete
+        added "ping" app to measure round-trip speed
 
-		timestamps
+0.1.3 - Released 9 Dec 2014
 
-		semi-standard contacts and profile manager
+	    rewritten protocol, using websockets
 
-0.2.2
+	    profile editor now includes photo (link and upload)
 
-		more query features (sort, limit, incremental results, $lt, nesting?)
+		incremental query via `Appear` and `Disappear` events
 
-		expanded js api (create/open, getters/setters)
+		now works in node.js, includes some command-line examples
 
-0.2.3
+==== YOU ARE HERE ====
 
-		proper logins, with account creation and passwords
+0.1.4 - (abandoned 11 Dec 2014 - some features will be in 0.2.0)
 
-		micropods
+	    focus mode (applications invoked to view data pages)
 
-		access control
+		social-graph traversal library, with autocomplete
 
-0.3.0
+		reworked pod-control iframe to be four states instead of two
 
-		back links and link following between servers
+0.2.0 - Target: 8 Jan 2015
 
-		vocabspec and rdf views
+        Use real Promise and EventEmitter instead of just objects with
+        .on and .then methods
+
+		Users have actual passwords, which are checked
+
+        Pod methods (eg push & query) can be called immediately.  (No
+        more need to wrap application logic in an onLogin callback.)
+
+		Query api changed a bit, to put more emphasis on appear/disappear
+
+		Somewhat real error handling added
+
+		Added some command-line tools
+
+0.3.0 - Target: late Jan 2015
+
+	    selenium and karma cross-browser test suite
+
+		Access control
+
+		big data values (eg pictures)
+
+		serving non-data pages
+
+		users can select their preferred apps
+
+		more powerful query expressions
+
+0.4.0 - Target: Feb 2015
+
+		early vocabspec
+
+		early queries across servers
+
 
 
   
