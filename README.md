@@ -56,9 +56,9 @@ On the other hand, crosscloud.js and the crosscloud system is:
 For more:
 
 * **Working with Data Pages**: (TODO!)
-* **Version 0.1.2 (10 Nov 2014):**: [Overview, with Examples](http://crosscloud.org/0.1.2/)
-* **Version 0.1.3 (9 Dec 2014):**: [Overview, with Examples](http://crosscloud.org/0.1.3/) [Release Notes](http://crosscloud.org/0.1.3/RELEASE.txt)
-* **Version 0.2.0 (planned Jan 2015):** [API Reference](https://github.com/sandhawke/crosscloud.js/blob/master/doc/planned-api.md)
+* **Version 0.1.2 (10 Nov 2014):** [Overview (with Examples)](http://crosscloud.org/0.1.2/)
+* **Version 0.1.3 (9 Dec 2014):** [Overview (with Examples)](http://crosscloud.org/0.1.3/) and [Release Notes](http://crosscloud.org/0.1.3/RELEASE.txt)
+* **Version 0.2.0 (planned Jan 2015):** [Draft API Reference](https://github.com/sandhawke/crosscloud.js/blob/master/doc/planned-api.md)
 * **Contributed Apps:** http://crosscloud.org/contrib
 * **Raise Issues:** [here](https://github.com/sandhawke/crosscloud.js/issues)
 * **Contact:** Sandro Hawke (hawke@mit.edu)
