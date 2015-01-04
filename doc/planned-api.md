@@ -1,9 +1,9 @@
 **This is a prospective draft, under discussion.   Not implemented yet!!**
 
-** Please send any feedback to sandro@w3&#2e;org or [raise an issue on github](https://github.com/sandhawke/crosscloud.js/issues/new). **
+** Please send any feedback to hawke@mit.edu or [raise an issue on github](https://github.com/sandhawke/crosscloud.js/issues/new). **
 
 This is a Javascript client library for the 
-[Crosscloud architecture](http://crosscloud.org/).
+[Crosscloud Architecture](http://crosscloud.org/).
 
 Install
 =======
