@@ -32,7 +32,8 @@ things better for application developers, too.  When used properly,
     threaded comments, calendar events are calendar events, etc, no
     matter which apps want to use them.
 
-Do you want your app to be all these things?  Do your users?
+
+Sounds great, doesn't it?
 
 On the other hand, crosscloud.js and the crosscloud system is:
 
