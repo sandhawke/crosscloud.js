@@ -16,9 +16,11 @@ crosscloud.js tends to make applications:
 * **Scalable:** Whether you have 5 users or 5 million, your code
     remains the same.  The Crosscloud platform handles the data
     scaling (or will, in theory!).
+
 * **Polite:** By letting users control their own data and switch
     between apps when they want to, you are respecting their freedom,
     individuality, and privacy.  Isn't that what everyone should do?
+
 * **Integrated:** Using Semantic Web techniques, Crosscloud
     applications are able to interoperate with each other via shared
     data and overlapping *vocabularies*.  Threaded comments are
@@ -31,10 +33,12 @@ On the other hand, crosscloud.js and the crosscloud system is:
 
 * **Not ready for "production" use:** This is currently a research
     project at MIT CSAIL.
+
 * **Not stable:** We're constantly tinkering with the APIs. We do
     versioning so your code wont break immediately, but we might
     remove any feature with only 60-days notice, to avoid the drag of
     old code.
+
 * **Not decentralized yet:** The servers are partial mock-ups right now,
     helping us understand the desired functionality. They'll work
     great for your app, but wont actually give users the promised
