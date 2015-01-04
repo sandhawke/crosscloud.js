@@ -1,5 +1,7 @@
 **This is a prospective draft, under discussion.   Not implemented yet!!**
 
+** Please send any feedback to sandro@w3&#2e;org or [raise an issue on github](https://github.com/sandhawke/crosscloud.js/issues/new). **
+
 This is a Javascript client library for the 
 [Crosscloud architecture](http://crosscloud.org/).
 
@@ -555,21 +557,30 @@ pod.rejectUser(message)
 Focus
 =====
 
-something like:
+Sometimes applications are called on to "open" some resource, rather
+than to start with a blank slate.  In this case, this property will be
+set to the URL of the resource to open:
 
 ```javascript
-
-pod.focusURL
-// or crosscloud.focusURL
-// or crosscloud.focusPage
+crosscloud.focusURL
 ```
+
+Applications which can work like this should:
+
+* Include a `_viewVia` property pointing to themselves in page they write
+  which they could open.  ISSUE: url or nested object?
+* Publish the list of shapes they can open as part of ./appinfo (more
+  details TBD).  Users pods will record that this app is an option to
+  open pages that match one of those shapes.  In this case,
+  `crosscloud.focusShape` will be the shape that was matched.  (What
+  if there's more than one?)
 
 Sharing Vocabularies
 ====================
 
 For integrated apps...
 
-Without this, your apps properties will only see other instance of themselves (and things claiming to be other instances of this app).
+Without this, your app's properties will only see other instance of themselves (and things claiming to be other instances of this app).
 
 something like:
 
@@ -593,5 +604,69 @@ unknown properties of an object?  Something like: pod.properties(id)
 Ohh, how about pod.getVocabspec(id) returns to vocabspec for the
 URL/object.   Then you can add that to yours if you want...
 
+Error Handling
+==============
 
+TODO: this section needs example code
+
+Since the pod methods are asynchronous, returning ES6
+Promises (using a polyfill if necessary), their reporting of error
+conditions is via the promise's `catch` method, not through the normal
+Javascript try/throw/catch syntax.
+
+Error handling with Promises can be very surprising.  In
+promise-driven code, if a program generates a something like a
+ReferenceError, perhaps because the developer typed the name of a
+method incorrectly, that error will be reported to the `catch` method,
+not propagated up to be reported to the developer.  If there is no
+`catch` method, the error will be silently ignored!
+
+To help avoid this debugging nightmare, and the tedium of having many
+`catch` methods which can't do anything useful, crosscloud.js internal
+errors are *also* reported as `error` events on the Client object.
+Further, if there are no registered listeners for these events, the
+library reports the error to the user.  This means in practice
+developers can ignore error handling except when there is an error
+they specifically want to handle.  (Many errors, like network
+timeouts, are more the concern of the user than the developer anyway,
+much of the time.)
+
+In the cases where an application does want to catch and handle a
+certain type of exception, it should add an `error` event listener to
+the Client (so the error isn't reported to the user), and then use
+either that listener or a `catch` function to handle the error.  Be
+careful to propagate any errors your code does not handle.  You can
+use `pod.defaultErrorListener(err)` to get the default behavior.
+
+ISSUE: should we have the events by broken down by type, like
+`pod.on('error.ReferenceError', ...)` ?  EventEmitter2 allows
+`pod.on('error.*', ...)` so that wouldn't be a hassle.
+
+Custom Error Types
+------------------
+
+Custom subclasses of Javascript's `Error` class are used to
+distinguish different errors, so they can be handled as desired, while
+propagating others.  This matches normal try/catch practice, as seen
+in [Mozilla: Handling A Specific
+Error](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Error#Example:_Handling_a_specific_error),
+but occurs in an event/promises context.
+
+The specific errors are:
+
+* **PermissionDenied**
+* **StorageExceeded**
+* **NetworkTimeout:** occurs only when a network timeout is set.  In
+    normal operation, Clients notify the user and wait indefinitely
+    for the network to be available.  
+* **ConcurrentModification:** occurs on `push` with an `_etag`, when
+    the page has a different etag (usually because something else
+    modified it).
+
+ISSUE: Maybe these last two should be ignored if not caught?  Maybe
+they should be called "warnings" instead of errors?
+on('warning.ConcurrentModification', ...) ?
+
+Please contact us if there are any exceptions you want to be able to
+catch!
 
