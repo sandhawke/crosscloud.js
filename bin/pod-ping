@@ -1,0 +1,42 @@
+#!/usr/bin/env node   
+"use strict"; //  -*-mode: javascript -*- 
+
+var crosscloud = require("../");
+var pod = crosscloud.defaultClient;
+
+var t0 = new Date();
+var count = 0;
+
+function answered() {
+	var t1 = new Date();
+	console.log("response",count,"in",(t1-t0),"ms");
+	count++
+	// if (count > 10) process.exit(1);
+	setTimeout(function () {
+		t0 = new Date();
+		pod.ping().then(answered);
+	}, 1000);
+}
+
+pod.ping().then(answered);
+
+/*   ... if you want... 
+pod.on('error', function (err) {
+	console.log(err);
+	process.exit(-1);
+});
+*/
+
+function f(a) {
+	return new Promise(function (fulfill, reject) {
+		setTimeout(function () { fulfill(a+1); }, 100);
+	})
+};
+
+require('es6-promise').polyfill();
+
+f(10).then(function (x) {
+	console.log("got",x);
+}).catch(function (err) {
+	console.log("err", err);
+})

@@ -8,7 +8,11 @@
     "url": "git://github.com/sandhawke/crosscloud.js.git"
   },
   "scripts": {
-    "test": "node_modules/mocha/bin/mocha"
+    "test": "mocha",
+    "build": "browserify lib/crosscloud.js --outfile bundle.js --exclude node_modules/podlogin/podlogin.js && cat browser/podlogin.js >> bundle.js && jsdoc -r lib"
+  },
+  "bin": {
+    "pod-ping": "bin/pod-ping.js"
   },
   "keywords": [
     "data sharing",
@@ -21,18 +25,22 @@
     "personal data"
   ],
   "author": "Sandro Hawke <sandro@hawke.org>",
-  "license": "New BSD",
+  "license": "MIT",
   "bugs": {
     "url": "https://github.com/sandhawke/crosscloud.js/issues"
   },
   "homepage": "https://github.com/sandhawke/crosscloud.js",
   "dependencies": {
+    "es6-promise": "^2.0.1",
+    "eventemitter2": "^0.4.14",
     "podlogin": "^0.1.3-1",
-    "promise": "^6.0.1",
-    "ws": "^0.5.0"
+    "ws": "^0.5.0",
+    "xmlhttprequest": "^1.6.0"
   },
   "devDependencies": {
+    "browserify": "^8.0.3",
     "chai": "^1.10.0",
-    "mocha": "^2.0.1"
+    "mocha": "^2.0.1",
+	"jsdoc": "^3.3.0"
   }
 }

@@ -1,0 +1,27 @@
+#!/usr/bin/env node   
+"use strict"; //  -*-mode: javascript -*- 
+
+require('es6-promise').polyfill();
+
+
+function f(a) {
+	return new Promise(function (fulfill, reject) {
+		setTimeout(function () { fulfill(a+1); }, 100);
+	})
+
+};
+
+f(10).then(function (x) {
+
+	// causes reject to run
+	var a=b.c;
+
+	console.log("got",x);
+}).catch(function (err) {
+
+	console.log("err", err);
+
+	// ignored
+	var a=c.c;
+
+})

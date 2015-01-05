@@ -3,5 +3,6 @@
 OLD/*
 node_modules/
 doctest/*
-
-
+out/*
+bundle.js
+npm-debug.log
