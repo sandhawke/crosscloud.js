@@ -1,0 +1,60 @@
+#!/usr/bin/env node   
+"use strict"; //  -*-mode: javascript -*- 
+
+var prompt = require('prompt');
+
+var crosscloud = require("../");
+
+var lm = new crosscloud.LoginManager({loginRequired:false});
+// var pod = new crosscloud.Client({loginRequired:false});
+
+console.log(lm);
+lm.on('login', function (x) { console.log('login', x); });
+lm.on('logout', function (x) { console.log('logout', x); });
+lm.on('nologin', function (x) { console.log('not logged in'); });
+
+// pod.ping().then(function() { console.log('pong'); });
+
+//console.log(process.argv);
+
+  // ARG -- I need to pass SOME argument in, otherwise
+  // node-login has no way to know if login is required or not.
+
+/*
+
+
+pod-login --create foo.example.com
+pod-login --login foo.example.com
+
+
+
+*/
+var schema = {
+    properties: {
+      name: {
+		  description: "Your Site URL or domain name:".blue,
+        pattern: /^[:\/.a-zA-Z\s\-]+$/,
+        message: 'This must be a URL or domain name',
+        required: true
+      },
+      password: {
+        description: "Select new password:".blue,
+        hidden: true
+      },
+      password2: {
+        description: "Confirm new password:".blue,
+        hidden: true
+      }
+    }
+  };
+prompt.start();
+prompt.message = "pod-login".green;
+prompt.delimiter = " ";
+prompt.get(schema, function (err, result) {
+    //
+    // Log the results.
+    //
+    console.log('Command-line input received:');
+    console.log('  name: ' + result.name);
+    console.log('  pw: ' + result.password);
+  });
