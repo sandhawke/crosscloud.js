@@ -1,7 +1,11 @@
 Crosscloud.js embodies a radical approach to Web Application
-development: it puts the data under user control. This actually makes
-things better for application developers, too.  When used properly,
-`crosscloud.js` tends to make applications:
+development: it puts the data under user control.  Instead of the app
+developer maintaining both an application front-end and the back-end,
+Crosscloud apps are built on a standard federated back-end service
+(under control of the user).  This is often great for both the
+end-user and the app developer.
+
+Applications developed with `crosscloud.js` tends to be:
 
 * **Fast:** With simple data flows, applications are often highly
     responsive, especially for multi-user features
