@@ -34,15 +34,14 @@ The Client Object
 
 Access to the user's data is through a `crosscloud.Client` object which
 serves as as local proxy for the user's personal data store (or
-"pod").  There is one default instance, which may be given a short
-name, like this:
+"pod").   Typically, the application begins by creating one `Client` instance:
 
 ```javascript
-var pod = crosscloud.defaultClient;
+var pod = new crosscloud.Client()
 ```
 
-In this documentation, we call this variable "pod", but "db" or
-"client" would also be a good names for it.
+In this documentation, we call the variable storing the instance
+"pod", but "db" or "client" would also be a good names for it.
 
 In some cases, applications may need multiple client objects, which
 can be obtained like:
@@ -233,6 +232,7 @@ query data:
   be a time value, instead of a string?)
 * _owner is a sub-page, available at _ownerURL, so you can do
   _owner.name, _owner._id, etc.
+* _sources (tbd, a provenance mechanism, eg for untrusted material)
 
 ### q.sort(propertyName);
 
@@ -407,6 +407,11 @@ The buf object also serves as an associative array from page ids to
 the objects themselves.  For every page id in the results,
 `buf[id]._id === id`.  This will never conflict with method names or
 property names like "results" because ids always contain a colon.
+
+ISSUE: maybe simplify this all into .on('redisplayable', cb), where cb
+is called with a buffer? or something?
+
+ISSUE: are the wait()'s really on buffer, not query?
 
 Incremental-Style Applications
 ------------------------------
